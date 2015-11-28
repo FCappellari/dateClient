@@ -1,0 +1,31 @@
+  <ion-nav-view>
+              <ion-content class="has-tabs has-header">
+                <ion-list>                  
+                  <div class="list card" ng-repeat="sugestion in sugestions">
+                    <div class="item">                     
+                      <h1>{{sugestion.name}}</h1>                      
+                    </div>
+                    <div class="item item-image">
+                      <img ng-src="{{sugestion.photo}}">
+                    </div>                   
+                    <div class="button-bar padding-top">
+                      <button class="icon ion-close-round button button-large button-clear button-balanced"></button>
+                      <button class="icon ion-ios-heart button button-large button-clear button-assertive"></button>
+                    </div>
+                  </div>
+                  <div class="list card">
+                    <div class="item">                     
+                      <h1>Emily, 20</h1>                      
+                    </div>
+                    <div class="item item-image">
+                      <img src="http://cdn.eldiariony.com/wp-content/uploads/2015/05/emily-ratajkowski-twitter-instagram-personal-photos-january-2014-collection_1.jpg">
+                    </div>                   
+                    <div class="button-bar padding-top">
+                      <button class="icon ion-close-round button button-large button-clear button-balanced"></button>
+                      <button class="icon ion-ios-heart button button-large button-clear button-assertive"></button>
+                    </div>
+                  </div>
+                  </ion-card>
+                </ion-list>
+              </ion-content>
+            </ion-nav-view>

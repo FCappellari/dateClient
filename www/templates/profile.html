@@ -1,0 +1,34 @@
+            <ion-view view-title="profile-tab">
+              <ion-content>
+                <ion-slide-box on-slide-changed="slideHasChanged($index)" class="no-padding">
+                  <ion-slide ng-repeat="photo in profilePhotos" repeat-done="repeatDone()" class"slideCustom">                
+                      <img ng-src="{{photo}}" height="400" width="400">                      
+                  </ion-slide>               
+                </ion-slide-box>                  
+                <ion-list>
+                  <ion-item class="item item-text-wrap profileName">
+                    <h2>{{profileName}}</h2>
+                    <span>
+                        <!--
+                        <i class="icon icon-left ion-location profileDistance"> 22Km </i> 
+                      -->
+                    </span>      
+                  </ion-item>
+                  <ion-item class="item item-text-wrap profileName">
+                     <p>
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu dictum eros. Nullam tincidunt consectetur orci, vel mollis tellus auctor nec. Nunc egestas aliquet vulputate. Donec ac dolor vehicula, lobortis lacus non, pharetra quam. Cras ac dui auctor, tincidunt neque non, elementum tortor.  
+                     </p>
+                  </ion-item>
+                  <ion-item class="item item-text-wrap profileName">
+                        <button class="button button-large  button-clear button-positive  ion-social-twitter-outline"></button>
+                        <button class="button button-large  button-clear button-positive ion-social-facebook"></button>
+                        <button class="button button-large button-clear button-positive  ion-social-snapchat-outline "></button>
+                        <button class="button button-large  button-clear button-positive ion-social-instagram-outline"></button>
+                        <button class="button button-large button-clear button-positive ion-social-whatsapp-outline"></button>                    
+                        <button class="button button-large button-clear button-positive  ion-social-youtube "></button>
+                        <button class="button button-large  button-clear button-positive ion-social-googleplus"></button>
+                        <button class="button button-large button-clear button-positive ion-social-pinterest"></button>
+                  </ion-item>
+                </ion-list>                              
+            </ion-content>                      
+          </ion-view>

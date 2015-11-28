@@ -1,0 +1,74 @@
+/* Empty. Add your own CSS if you like */
+body{
+  font-family: Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif;
+}
+
+.slider-pager-page
+{
+  color: white;
+  fill: #f90;
+  stroke: red;
+
+  
+}
+.slider-pager-page.active
+{
+  fill: #f90;  
+  color: blue;
+  
+}
+
+.platform-android {
+  .tabs-content {
+    @extend .has-tabs-top;
+  }
+}
+
+.platform-ios {
+  .tabs-content {
+    @extend .has-tabs;
+  }
+}
+
+.profileName h2{ 
+   font-size: 2.0em;   
+}
+
+.profileDistance{
+  font-size: 1.5em;
+
+}
+
+.no-padding {
+    padding: 0px !important;
+}
+
+.slider {
+  height:23em; /* slider height you want */
+}
+.slider-slide {
+ color: #000;
+ background-color: #fff;
+ height: 100%;
+} 
+
+.slider-slide img {
+    max-width: 100%;
+    height: auto;
+    width: auto\9; /* ie8 */
+}
+
+.sugestion{
+  height:25sem;
+
+}
+
+.sugestion img{  
+    max-width: 100%;
+    height: auto;
+    width: auto\9; /* ie8 */
+}
+
+.slideCustom img{
+    
+}
