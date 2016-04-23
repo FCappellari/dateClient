@@ -6,7 +6,7 @@
 angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB'])
 
 .run(function ($ionicPlatform, ngFB) {  
-  ngFB.init({appId: '182608422078754'});
+  ngFB.init({appId: '973158726110069'});
 
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -20,7 +20,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB'])
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 
   $stateProvider
     .state('login', {
@@ -34,7 +34,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB'])
       templateUrl: 'templates/tabs.html'
     })
     .state('tabs.profile', {
-      url: '/profile',
+      url: '/profile/:idProfile ',
       views: {
         'profile-tab': {
           templateUrl: 'templates/profile.html',
@@ -51,7 +51,9 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB'])
         }
       }
     });
-
+   
+   /*if(!ionic.Platform.isIOS())*/
+      $ionicConfigProvider.scrolling.jsScrolling(false);
 
    $urlRouterProvider.otherwise('/login');
 

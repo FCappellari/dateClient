@@ -1,0 +1,13 @@
+{
+  "name": "facebook-connect-plugin",
+  "_cacheHeaders": {
+    "ETag": "\"a3c813ca3a7d392f4ff494e2c23428288a045c43\"",
+    "Content-Length": "3759",
+    "Content-Type": "text/plain; charset=utf-8"
+  },
+  "_release": "e-tag:a3c813ca3",
+  "main": "index.js",
+  "_source": "https://raw.githubusercontent.com/phonegap-build/FacebookConnect/master/www/phonegap/plugin/facebookConnectPlugin/facebookConnectPlugin.js",
+  "_target": "*",
+  "_originalSource": "https://raw.githubusercontent.com/phonegap-build/FacebookConnect/master/www/phonegap/plugin/facebookConnectPlugin/facebookConnectPlugin.js"
+}

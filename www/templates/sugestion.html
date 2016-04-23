@@ -1,12 +1,12 @@
   <ion-nav-view>
               <ion-content class="has-tabs has-header">
                 <ion-list>                  
-                  <div class="list card" ng-repeat="sugestion in sugestions">
+                  <div class="list card" ng-repeat="sugestion in sugestions" ng-model="sugestion" >
                     <div class="item">                     
                       <h1>{{sugestion.name}}</h1>                      
                     </div>
                     <div class="item item-image">
-                      <img ng-src="{{sugestion.photo}}">
+                      <img ng-src="{{sugestion.photos}}" ng-click="callSugestionProfile(sugestion)">
                     </div>                   
                     <div class="button-bar padding-top">
                       <button class="icon ion-close-round button button-large button-clear button-balanced"></button>

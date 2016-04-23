@@ -2,6 +2,8 @@
   "name": "HelloIonic",
   "private": "true",
   "devDependencies": {
-    "ionic": "driftyco/ionic-bower#1.1.1"
+    "ionic": "driftyco/ionic-bower#1.1.1",
+	"ngCordova": "v0.1.7-alpha",
+	"facebook-connect-plugin": "https://raw.githubusercontent.com/phonegap-build/FacebookConnect/master/www/phonegap/plugin/facebookConnectPlugin/facebookConnectPlugin.js"
   }
 }
