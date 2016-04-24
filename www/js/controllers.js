@@ -1,8 +1,8 @@
 angular.module('starter.controllers', ['starter.services'])
 
-//.constant('WEBSERVICE_URL', 'localhost:8080')
-.constant('WEBSERVICE_URL', '52.34.48.120:8180')
-//.constant('WEBSERVICE_URL', '192.168.25.4:8080')
+.constant('WEBSERVICE_URL', 'localhost:8080')
+//.constant('WEBSERVICE_URL', '52.34.48.120:8180')
+//.constant('WEBSERVICE_URL', '192.168.25.8:8080')
 
 .controller('AppCtrl', function ($scope, WEBSERVICE_URL, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $q, UserService, $ionicLoading) {
 
@@ -56,7 +56,7 @@ angular.module('starter.controllers', ['starter.services'])
                                  
             $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/login", $scope.userConfig, config).
             success(function(data, status, headers, config) {             
-                $state.go('tabs.profile');
+                $state.go('tabs.sugestion');
             }).
             error(function(data, status, headers, config) {
             
@@ -200,29 +200,32 @@ angular.module('starter.controllers', ['starter.services'])
   /*-------------------------- FIM DAS COISA NOVA -----------------------*/
 })
 
-.controller('ProfileCtrl', function ($scope, $state, $stateParams, WEBSERVICE_URL, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate) {
-  console.log("ProfileCtrl ProfileCtrl ProfileCtrl");
-  $scope.getUserInfo = function(){
-        
+.controller('ProfileCtrl', function ($scope, $state, $stateParams, WEBSERVICE_URL, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal) {  
+ 
+    // Create the login modal that we will use later
+    $ionicModal.fromTemplateUrl('templates/profile.html', {
+      scope: $scope
+    }).then(function(modal) {
+      $scope.modal = modal;
+    });
+
+    $scope.getUserInfo = function(){        
         
         var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
         $http({
             method: 'GET',
             url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/profile' 
-         }).then(function successCallback(response) {              
-          console.log(response);
-          $scope.profileName = response.data.name;
-          $scope.profileGender = response.data.gender;    
-          $scope.profileIdFacebook = response.data.fbId;                 
-          $scope.profilePictureUrl = response.data.photos[2];
-          $scope.profileCoverUrl = response.data.photos[7];
-          $scope.profilePhotos = response.data.photos;
+         }).then(function successCallback(response) {                        
+             $scope.profile = response.data;          
+             console.log("getUserInfo");
+             console.log($scope.profile);
           }, function errorCallback(response) {
               console.log("FALHA");
           // called asynchronously if an error occurs
           // or server returns response with an error status.
         });
     }; 
+
     console.log("$stateParams.profileId = " + $stateParams.idProfile);
 
     if($stateParams.idProfile==""||$stateParams.idProfile==undefined){
@@ -231,17 +234,38 @@ angular.module('starter.controllers', ['starter.services'])
       var userId =$stateParams.idProfile;
     }
 
-    $scope.getUserInfo();
+    //$scope.getUserInfo();
 
     $scope.repeatDone = function() {
       $ionicSlideBoxDelegate.update();
       //$ionicSlideBoxDelegate.slide($scope.week.length - 1, 1);
     };
+
+    $scope.getLoggedUserProfile = function(){
+      console.log("e nois");
+      $scope.getUserInfo();
+      
+      // Open the login modal
+      $scope.modal.show();
+    };    
+
+    //close modal 
+    $scope.closeProfile = function() {
+      $scope.modal.hide();      
+    };  
+
 })
 
 .controller('SugestionCtrl', function ($scope, WEBSERVICE_URL, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state) {
     
-     $scope.getUserSugestion = function(){
+    // Create the login modal that we will use later
+    $ionicModal.fromTemplateUrl('templates/profile.html', {
+      scope: $scope
+    }).then(function(modal2) {
+      $scope.modal2 = modal2;
+    });
+
+    $scope.getUserSugestion = function(){
         
         /* sugestion object 
          * id = id facebook
@@ -258,30 +282,67 @@ angular.module('starter.controllers', ['starter.services'])
             url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/sugestions' 
          }).then(function successCallback(response) {          
             console.log(response);
-            $scope.sugestions = response.data;
-            console.log("asdasdsa");
-            console.log($scope.sugestions.data)
+            $scope.sugestions = response.data;            
          }, function errorCallback(response) {
               console.log("FALHA");
             
         });
-      };
+    };
 
-      $scope.getUserSugestion();
+    $scope.getUserSugestion();
 
-      $scope.callSugestionProfile = function(sugestion){
-          
-          var userId = sugestion.id; 
-          console.log("callSugestionProfile.id = " + sugestion.id);
-          $state.go("tabs.profile", { idProfile:sugestion.id });
+    $scope.callSugestionProfile = function(sugestion){                       
+      
+      console.log("callSugestionProfile");     
+      console.log(sugestion);     
 
+      var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
+      $http({
+          method: 'GET',
+          url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + sugestion.id +'/profile' 
+       }).then(function successCallback(response) {
 
-      };
+        $scope.profile = response.data;          
+        console.log($scope.profile);
 
+        $scope.modal2.show();    
+        }, function errorCallback(response) {
+            console.log("FALHA");
+        // called asynchronously if an error occurs
+        // or server returns response with an error status.
+      });        
+      
+      // Open the login modal
+     
+    };
+
+    //close modal 
+    $scope.closeProfile = function() {
+      $scope.modal2.hide();      
+    }; 
 })
 
 .controller('LoginCtrl', function ($scope, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope) {
   
+})
+
+.controller('MenuCtrl', function ($scope, WEBSERVICE_URL, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state) {
+
+  console.log("MenuCtrl");
+
+  var userId = window.localStorage['userId'] || 'semID';
+  var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
+  $http({
+      method: 'GET',
+      url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/profile' 
+   }).then(function successCallback(response) {                        
+       $scope.profile = response.data;                 
+       console.log($scope.profile);
+    }, function errorCallback(response) {
+        console.log("FALHA");
+        // called asynchronously if an error occurs
+        // or server returns response with an error status.
+  });
 })
 
 .controller('HomeCtrl', function($scope, UserService, $ionicActionSheet, $state, $ionicLoading){

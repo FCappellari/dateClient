@@ -3,7 +3,7 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB'])
+angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-native-transitions'])
 
 .run(function ($ionicPlatform, ngFB) {  
   ngFB.init({appId: '973158726110069'});
@@ -22,25 +22,42 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB'])
 
 .config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 
+  //import 'ionic-native-transitions';
+  //require('ionic-native-transitions');
+
   $stateProvider
     .state('login', {
       url: '/login',
       templateUrl: 'templates/login.html',
-      controller: 'LoginCtrl'
+      controller: 'LoginCtrl',
+      nativeTransitionsAndroid: {
+        "type": "flip",
+        "direction": "right"
+      },
     })    
+
     .state('tabs', {
       url: '/tab',
       abstract: true,
-      templateUrl: 'templates/tabs.html'
+      templateUrl: 'templates/tabs.html',
+      controller: 'ProfileCtrl',
+      nativeTransitionsAndroid: {
+        "type": "flip",
+        "direction": "right"
+      },
     })
     .state('tabs.profile', {
       url: '/profile/:idProfile ',
       views: {
         'profile-tab': {
           templateUrl: 'templates/profile.html',
-          controller: 'ProfileCtrl'
+          controller: 'ProfileCtrl',
         }
-      }
+      },
+      nativeTransitionsAndroid: {
+        "type": "flip",
+        "direction": "right"
+      },
     })
     .state('tabs.sugestion', {
       url: '/sugestion',
@@ -54,6 +71,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB'])
    
    /*if(!ionic.Platform.isIOS())*/
       $ionicConfigProvider.scrolling.jsScrolling(false);
+      $ionicConfigProvider.tabs.position("top");
 
    $urlRouterProvider.otherwise('/login');
 

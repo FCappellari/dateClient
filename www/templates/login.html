@@ -1,11 +1,16 @@
 <ion-view view-title="Sign-In">
     <ion-content>
         <label class="item" ng-controller="AppCtrl">
-          <button class="button button-block button-positive" ng-click="fbLogin()">
+          <button class="button button-block button-positive" ng-click="facebookSignIn()">
+          Login with Mobile Facebook
+          {{user.name}}
+          </button>         
+      </label>     
+       <label class="item" ng-controller="AppCtrl">
+          <button class="button button-block button-assertive" ng-click="fbLogin()">
           Login with Facebook
           {{user.name}}
           </button>         
       </label>     
-       <a class="facebook-sign-in button button-block" ng-click="facebookSignIn()">Login with Facebook</a>     
     </ion-content>
 </ion-view>

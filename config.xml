@@ -7,6 +7,30 @@
   <author email="hi@ionicframework" href="http://ionicframework.com/">
       Ionic Framework Team
     </author>
+  
+  <platform name="android">
+    <!-- you can use any density that exists in the Android project -->
+    <splash src="www/img/logoDate.png" density="land-hdpi"/>
+    <splash src="www/img/logoDate.png" density="land-ldpi"/>
+    <splash src="www/img/logoDate.png" density="land-mdpi"/>
+    <splash src="www/img/logoDate.png" density="land-xhdpi"/>
+
+    <splash src="www/img/logoDate.png" density="port-hdpi"/>
+    <splash src="www/img/logoDate.png" density="port-ldpi"/>
+    <splash src="www/img/logoDate.png" density="port-mdpi"/>
+    <splash src="www/img/logoDate.png" density="port-xhdpi"/>
+  
+	<preference name="AutoHideSplashScreen" value="true" />
+	<preference name="SplashScreenDelay" value="5000" />
+	<preference name="FadeSplashScreen" value="true"/>
+	<preference name="FadeSplashScreenDuration" value="1000"/>	
+	<preference name="SplashMaintainAspectRatio" value="true" />
+	<preference name="SplashShowOnlyFirstTime" value="true" />
+  </platform>
+  
+  <preference name="CrosswalkAnimatable" value="true" />
+  
+  <allow-navigation href="http://*/*" />
   <content src="index.html"/>
   <access origin="*"/>
   <preference name="webviewbounce" value="false"/>
@@ -15,6 +39,6 @@
   <preference name="android-minSdkVersion" value="16"/>
   <preference name="BackupWebStorage" value="none"/>
   <feature name="StatusBar">
-    <param name="ios-package" value="CDVStatusBar" onload="true"/>
+    <param name="ios-package" value="CDVStatusBar" onload="true"/>	
   </feature>
 </widget>

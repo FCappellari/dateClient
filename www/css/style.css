@@ -72,3 +72,19 @@ body{
 .slideCustom img{
     
 }
+
+.menu .bar.bar-header.expanded {    
+    background-size: 120%;
+    background-position: 0%;
+    transition: all .5s ease-in-out;
+}
+.avatar2{
+  height: 3em;
+  width: 3em;
+}
+
+.tabs-top > .tabs, .tabs.tabs-top{
+  top:44px !important;
+}
+}
+
