@@ -1,12 +1,34 @@
 angular.module('starter.controllers', ['starter.services'])
 
-.constant('WEBSERVICE_URL', 'localhost:8080')
+//  .constant('WEBSERVICE_URL', 'localhost:8080')
 //.constant('WEBSERVICE_URL', '52.34.48.120:8180')
-//.constant('WEBSERVICE_URL', '192.168.25.8:8080')
+  .constant('WEBSERVICE_URL', '192.168.25.8:8080')
 
 .controller('AppCtrl', function ($scope, WEBSERVICE_URL, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $q, UserService, $ionicLoading) {
 
-  $scope.fbLogin = function () {
+  /*
+   * Name: fbLogin() 
+   * Description: Método reponsavel pela autenticacao do facebook via browser 
+   * Author: Edian Comachio
+   */
+  $ionicModal.fromTemplateUrl('templates/createLoading.html', {
+      scope: $scope
+  }).then(function(modalLoading) {
+      $scope.modalLoading = modalLoading;
+  });
+
+  $scope.fbLogin = function () {   
+
+    $scope.modalLoading.show();
+
+    /* $ionicLoading.show({
+    content: 'Loading',
+    animation: 'fade-in',
+    showBackdrop: true,
+    maxWidth: 200,
+    showDelay: 0
+    }); */
+  
     ngFB.login({
                 scope: 'user_birthday,user_religion_politics,user_relationships,user_relationship_details,user_hometown,' +
                        'user_location,user_likes,user_education_history,user_work_history, user_website, user_managed_groups,' +
@@ -17,57 +39,146 @@ angular.module('starter.controllers', ['starter.services'])
             if (response.status === 'connected') {
                 console.log(response.authResponse.accessToken);
                 window.localStorage['accessToken'] = response.authResponse.accessToken;          
-                $scope.getFbUser();
+                $scope.getFbUser();                
             } else {
                 alert('Facebook login failed');
-            }
+                $ionicLoading.hide()
+            }            
         });
   };
-
+  
+  /*
+   * Name: getFbUser() 
+   * Desription: Método reponsavel por buscar o usuario do facebook com inf basicas
+   * Author: Edian Comachio
+   */
   $scope.getFbUser = function(){
     ngFB.api({
          path: '/me',
         params: {fields: 'id,name,email,gender,location'}
-    }).then(function (user) {
-      console.log(user);
+    }).then(function (user) {      
       $scope.user = user;
       $rootScope.userId = user.id;
       $rootScope.accessToken = user.accessToken;
-      window.localStorage['userId'] = user.id;
-      
-      console.log(window.localStorage['accessToken']);
-      $scope.checkIfUserExist();
+      window.localStorage['userId'] = user.id;     
+
+      checkIfUserExist();     
     },
     function (error) {
       alert('Facebook error: ' + error.error_description);
     });
   }  
+  
+  /*
+   * Name: checkIfUserExist() 
+   * Description: Método reponsavel por verificar se o usuario existe no bando de dados
+   * Author: Edian Comachio
+   */  
+  checkIfUserExist = function(){
+    $http({
+      method: 'GET',
+      url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + $rootScope.userId +'/exists' 
+    }).then(function successCallback(response) {   
+      console.log(response.data);
+       if(response.data){
+          updateUser();
+       }else{
+          createUser();
+       }
+    }, function errorCallback(response) {
+       console.log("FALHA");  
+    });
+  }
 
+  
+  /*
+   * Name: updateUser() 
+   * Description: Método reponsavel por atualizar o usuario na base
+   * Author: Edian Comachio
+   */  
+  updateUser = function(){
+    //headers
+    var config = {
+      headers:  {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    }
+
+    //objeto usuario
+    $scope.userConfig = {
+      accessToken: window.localStorage['accessToken'],
+      id: $rootScope.userId
+    }
+
+    $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/update", $scope.userConfig, config).
+    success(function(data, status, headers, config) {
+         $scope.modalLoading.hide();    
+         $state.go('tabs.sugestion');
+    }).
+    error(function(data, status, headers, config) {          
+      console.log("Erro ao atualizar usuario");
+      $scope.modalLoading.hide();
+    });
+  }
+
+  /*
+   * Name: createUser() 
+   * Description: Método reponsavel por criar o usuario na base
+   * Author: Edian Comachio
+   */     
+  createUser = function(){
+    //headers
+    var config = {
+      headers:  {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'        
+      }
+    }
+
+    //objeto usuario
+    $scope.userConfig = {
+      accessToken: window.localStorage['accessToken'],
+      id: $rootScope.userId
+    }
+
+    console.log($scope.userConfig);
+
+    $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/create", $scope.userConfig, config).
+    success(function(data, status, headers, config) {
+      modalLoading.hide();
+      $state.go('tabs.sugestion');
+    }).
+    error(function(data, status, headers, config) {          
+      console.log("Erro ao criar usuario");
+      $ionicLoading.hide()
+    });
+  }
+
+  
   $scope.checkIfUserExist =function(){
-            console.log("checkIfUserExist");
-            console.log(window.localStorage['accessToken']);
-            $scope.userConfig = {accessToken: window.localStorage['accessToken'],
-                                 id: $rootScope.userId}
-            var config = {headers:  {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            };                                   
-                                 
-            $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/login", $scope.userConfig, config).
-            success(function(data, status, headers, config) {             
-                $state.go('tabs.sugestion');
-            }).
-            error(function(data, status, headers, config) {
-            
-            });
-        };
-
-
-  /*------------------- AQUI COISA NOVA COPIADA ----------------------------*/
-  console.log("WelcomeCtrl WelcomeCtrl WelcomeCtrl");
+      console.log("checkIfUserExist");
+      console.log(window.localStorage['accessToken']);
+      $scope.userConfig = {accessToken: window.localStorage['accessToken'],
+                           id: $rootScope.userId}
+      var config = {headers:  {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+          }
+      };                                   
+                           
+      $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/login", $scope.userConfig, config).
+      success(function(data, status, headers, config) {
+          $ionicLoading.hide()
+          $state.go('tabs.sugestion');
+      }).
+      error(function(data, status, headers, config) {          
+          $ionicLoading.hide()
+      });
+  };
+  
   // This is the success callback from the login method
-  var fbLoginSuccess = function(response) {
+    var fbLoginSuccess = function(response) {
     if (!response.authResponse){
       fbLoginError("Cannot find the authResponse");
       return;
@@ -102,7 +213,7 @@ angular.module('starter.controllers', ['starter.services'])
   // This method is to get the user profile info from the facebook api
   var getFacebookProfileInfo = function (authResponse) {
     var info = $q.defer();
-
+    
     facebookConnectPlugin.api('/me?fields=email,name&access_token=' + authResponse.accessToken, null,
       function (response) {
         console.log(response);
@@ -118,17 +229,20 @@ angular.module('starter.controllers', ['starter.services'])
 
   //This method is executed when the user press the "Login with facebook" button
   $scope.facebookSignIn = function() {
-     console.log("AQUI facebookSignIn");
+    
+    console.log("AQUI facebookSignIn");
+    $scope.modalLoading.show();
     facebookConnectPlugin.getLoginStatus(function(success){
+
       if(success.status === 'connected'){
         // The user is logged in and has authenticated your app, and response.authResponse supplies
         // the user's ID, a valid access token, a signed request, and the time the access token
         // and signed request each expire
-        console.log('getLoginStatus', success.status);
-
+        
         // Check if we have our user saved
         var user = UserService.getUser('facebook');
-
+        console.log(success.authResponse);
+        window.localStorage['accessToken'] = success.authResponse.accessToken;
         if(!user.userID){
           getFacebookProfileInfo(success.authResponse)
           .then(function(profileInfo) {
@@ -139,20 +253,19 @@ angular.module('starter.controllers', ['starter.services'])
               name: profileInfo.name,
               email: profileInfo.email,
               picture : "http://graph.facebook.com/" + success.authResponse.userID + "/picture?type=large"
-            });
-
-             console.log("aqui 2 edian");
+            });            
             console.log(profileInfo);
+
             $scope.user = profileInfo;
             $rootScope.userId = profileInfo.id;
-            $rootScope.accessToken = profileInfo.accessToken;
-            console.log("aqui 3 edian");
-            window.localStorage['userId'] = profileInfo.id;
+            $rootScope.accessToken = profileInfo.accessToken;            
+
+            window.localStorage['userId'] = profileInfo.id;                  
+
+            if(checkIfUserExist())
+              updateUser()
+            else createUser();
             
-            console.log(window.localStorage['accessToken']);
-            console.log("aqui 4 edian");
-            $scope.checkIfUserExist();
-            console.log("aqui 5 edian")
 ;          }, function(fail){
             // Fail get profile info
             console.log('profile info fail', fail);
@@ -171,7 +284,9 @@ angular.module('starter.controllers', ['starter.services'])
             
             console.log(window.localStorage['accessToken']);
             console.log("aqui 4 edian");
-            $scope.checkIfUserExist();
+            if(checkIfUserExist())
+              updateUser()
+            else createUser();
             console.log("aqui 5 edian");
           });
         }
@@ -258,6 +373,20 @@ angular.module('starter.controllers', ['starter.services'])
 
 .controller('SugestionCtrl', function ($scope, WEBSERVICE_URL, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state) {
     
+    $scope.doRefreshSugestion = function(){
+      
+      var userId = window.localStorage['userId'] || 'semID';
+
+      $http.get('http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/sugestions' )
+         .success(function(newItems) {
+           $scope.sugestions = newItems;
+         })
+         .finally(function() {
+           // Stop the ion-refresher from spinning
+           $scope.$broadcast('scroll.refreshComplete');
+         });      
+    }
+
     // Create the login modal that we will use later
     $ionicModal.fromTemplateUrl('templates/profile.html', {
       scope: $scope

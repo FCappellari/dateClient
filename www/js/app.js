@@ -20,11 +20,12 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-na
   });
 })
 
+
 .config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 
   //import 'ionic-native-transitions';
   //require('ionic-native-transitions');
-
+  $ionicConfigProvider.scrolling.jsScrolling(false);
   $stateProvider
     .state('login', {
       url: '/login',
@@ -69,9 +70,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-na
       }
     });
    
-   /*if(!ionic.Platform.isIOS())*/
-      $ionicConfigProvider.scrolling.jsScrolling(false);
-      $ionicConfigProvider.tabs.position("top");
+ 
+  $ionicConfigProvider.tabs.position("top");
 
    $urlRouterProvider.otherwise('/login');
 

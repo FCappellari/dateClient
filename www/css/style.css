@@ -84,7 +84,83 @@ body{
 }
 
 .tabs-top > .tabs, .tabs.tabs-top{
-  top:44px !important;
-}
+  z-index: 999 !important; 
+  width: 85% !important; 
+  right: 0 !important; 
+  box-shadow: 0 0 0 0 rgba(0,0,0,.26) !important;  
 }
 
+.bar-header{
+  height: 49px !important;
+}
+
+.outWithHasTabsTop{
+  top: 44px !important; 
+}
+
+.createLoading{
+   background: url("blurground.jpg") no-repeat;  
+     -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.creatingLoadingConteiner{
+  width:200px;
+  height:200px;
+  position:absolute;
+  top:50%;
+  left:50%;
+  margin-top:-100px;
+  margin-left:-100px;
+
+}
+
+.spinnerCreate{
+
+}
+
+.createLoadingText{  
+  text-align: center;
+}
+
+.createLoading .item{  
+
+}
+
+.createLoadingText h2{
+   color: #fff;
+}
+
+.loginScreen{
+   background: url("screen2.jpg") no-repeat;   
+}
+
+.loginLogo p {  
+  color: #fff;
+  text-shadow: 1px 1px 1px #000;
+}
+.tabs-top > .tabs, .tabs.tabs-top{
+  top:0 !important;
+}
+.loginLogo{   
+   text-align: center;
+   margin-top: 100px;
+   font-size: 80px;   
+   font-weight: bold;   
+}
+
+.loginScreen .item{
+  background: inherit !important;
+  position: absolute;
+  top: 60%;
+  border: none;
+}
+
+.spinner svg {
+  width: 80% !important;
+  height: 85px !important;
+  position: absolute;
+  left: 10% !important;
+}

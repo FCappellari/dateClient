@@ -1,44 +1,41 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version='1.0' encoding='utf-8'?>
 <widget id="com.ionicframework.datev6180240" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-  <name>datev6</name>
-  <description>
+    <name>datev6</name>
+    <description>
         An Ionic Framework and Cordova project.
     </description>
-  <author email="hi@ionicframework" href="http://ionicframework.com/">
+    <author email="hi@ionicframework" href="http://ionicframework.com/">
       Ionic Framework Team
     </author>
-  
-  <platform name="android">
-    <!-- you can use any density that exists in the Android project -->
-    <splash src="www/img/logoDate.png" density="land-hdpi"/>
-    <splash src="www/img/logoDate.png" density="land-ldpi"/>
-    <splash src="www/img/logoDate.png" density="land-mdpi"/>
-    <splash src="www/img/logoDate.png" density="land-xhdpi"/>
-
-    <splash src="www/img/logoDate.png" density="port-hdpi"/>
-    <splash src="www/img/logoDate.png" density="port-ldpi"/>
-    <splash src="www/img/logoDate.png" density="port-mdpi"/>
-    <splash src="www/img/logoDate.png" density="port-xhdpi"/>
-  
-	<preference name="AutoHideSplashScreen" value="true" />
-	<preference name="SplashScreenDelay" value="5000" />
-	<preference name="FadeSplashScreen" value="true"/>
-	<preference name="FadeSplashScreenDuration" value="1000"/>	
-	<preference name="SplashMaintainAspectRatio" value="true" />
-	<preference name="SplashShowOnlyFirstTime" value="true" />
-  </platform>
-  
-  <preference name="CrosswalkAnimatable" value="true" />
-  
-  <allow-navigation href="http://*/*" />
-  <content src="index.html"/>
-  <access origin="*"/>
-  <preference name="webviewbounce" value="false"/>
-  <preference name="UIWebViewBounce" value="false"/>
-  <preference name="DisallowOverscroll" value="true"/>
-  <preference name="android-minSdkVersion" value="16"/>
-  <preference name="BackupWebStorage" value="none"/>
-  <feature name="StatusBar">
-    <param name="ios-package" value="CDVStatusBar" onload="true"/>	
-  </feature>
+    <platform name="android">
+        <splash density="land-hdpi" src="www/img/logoDate.png" />
+        <splash density="land-ldpi" src="www/img/logoDate.png" />
+        <splash density="land-mdpi" src="www/img/logoDate.png" />
+        <splash density="land-xhdpi" src="www/img/logoDate.png" />
+        <splash density="port-hdpi" src="www/img/logoDate.png" />
+        <splash density="port-ldpi" src="www/img/logoDate.png" />
+        <splash density="port-mdpi" src="www/img/logoDate.png" />
+        <splash density="port-xhdpi" src="www/img/logoDate.png" />
+        <preference name="AutoHideSplashScreen" value="true" />
+        <preference name="SplashScreenDelay" value="5000" />
+        <preference name="FadeSplashScreen" value="true" />
+        <preference name="FadeSplashScreenDuration" value="1000" />
+        <preference name="SplashMaintainAspectRatio" value="true" />
+        <preference name="SplashShowOnlyFirstTime" value="true" />
+    </platform>
+	
+    
+	
+    <allow-navigation href="http://*/*" />
+	
+    <content src="index.html" />
+    <access origin="*" />
+    <preference name="webviewbounce" value="false" />
+    <preference name="UIWebViewBounce" value="false" />
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="android-minSdkVersion" value="16" />
+    <preference name="BackupWebStorage" value="none" />
+    <feature name="StatusBar">
+        <param name="ios-package" onload="true" value="CDVStatusBar" />
+    </feature>
 </widget>
