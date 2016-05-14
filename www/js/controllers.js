@@ -1,33 +1,46 @@
 angular.module('starter.controllers', ['starter.services'])
 
-//  .constant('WEBSERVICE_URL', 'localhost:8080')
-//.constant('WEBSERVICE_URL', '52.34.48.120:8180')
-  .constant('WEBSERVICE_URL', '192.168.25.8:8080')
+//.constant('WEBSERVICE_URL', 'localhost:8080')
+.constant('WEBSERVICE_URL', '52.34.48.120:8180')
+//.constant('WEBSERVICE_URL', '192.168.25.8:8080')
 
+/*
+ * Controller: AppCrtl
+ * Description: Gerenciamento geral da aplicação
+ */
 .controller('AppCtrl', function ($scope, WEBSERVICE_URL, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $q, UserService, $ionicLoading) {
 
-  /*
-   * Name: fbLogin() 
-   * Description: Método reponsavel pela autenticacao do facebook via browser 
-   * Author: Edian Comachio
-   */
+  /* inicializa modal */
   $ionicModal.fromTemplateUrl('templates/createLoading.html', {
       scope: $scope
   }).then(function(modalLoading) {
       $scope.modalLoading = modalLoading;
   });
 
+  /*
+   * Name: Login() 
+   * Description: Método reponsavel por direcionar o login conforme a plataforma WEB ou Dispositivo movel
+   * Author: Edian Comachio
+   */
+  $scope.login = function(){
+    if (window.cordova) {
+      console.log("DEVICE");
+      $scope.facebookSignIn();
+    } else {
+      console.log("WEB");
+      $scope.fbLogin();
+    }
+  }
+
+  /*
+   * Name: fbLogin() 
+   * Description: Método reponsavel pela autenticacao do facebook via browser 
+   * Author: Edian Comachio
+   */
   $scope.fbLogin = function () {   
 
     $scope.modalLoading.show();
-
-    /* $ionicLoading.show({
-    content: 'Loading',
-    animation: 'fade-in',
-    showBackdrop: true,
-    maxWidth: 200,
-    showDelay: 0
-    }); */
+    $scope.message = "Keep calm, we dont post anything on your Facebook";
   
     ngFB.login({
                 scope: 'user_birthday,user_religion_politics,user_relationships,user_relationship_details,user_hometown,' +
@@ -75,19 +88,20 @@ angular.module('starter.controllers', ['starter.services'])
    * Author: Edian Comachio
    */  
   checkIfUserExist = function(){
-    $http({
-      method: 'GET',
-      url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + $rootScope.userId +'/exists' 
-    }).then(function successCallback(response) {   
-      console.log(response.data);
-       if(response.data){
-          updateUser();
-       }else{
-          createUser();
-       }
-    }, function errorCallback(response) {
-       console.log("FALHA");  
-    });
+      $scope.message = "Calibrating your heart...";
+      $http({
+        method: 'GET',
+        url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + $rootScope.userId +'/exists' 
+      }).then(function successCallback(response) {   
+        console.log(response.data);
+        if(response.data){
+            updateUser();
+        }else{
+            createUser();
+        }
+      }, function errorCallback(response) {
+        console.log("FALHA");  
+      });
   }
 
   
@@ -97,29 +111,30 @@ angular.module('starter.controllers', ['starter.services'])
    * Author: Edian Comachio
    */  
   updateUser = function(){
-    //headers
-    var config = {
-      headers:  {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+      //headers
+      $scope.message = "Updating your type...";
+      var config = {
+        headers:  {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
       }
-    }
 
-    //objeto usuario
-    $scope.userConfig = {
-      accessToken: window.localStorage['accessToken'],
-      id: $rootScope.userId
-    }
+      //objeto usuario
+      $scope.userConfig = {
+        accessToken: window.localStorage['accessToken'],
+        id: $rootScope.userId
+      }
 
-    $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/update", $scope.userConfig, config).
-    success(function(data, status, headers, config) {
-         $scope.modalLoading.hide();    
-         $state.go('tabs.sugestion');
-    }).
-    error(function(data, status, headers, config) {          
-      console.log("Erro ao atualizar usuario");
-      $scope.modalLoading.hide();
-    });
+      $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/update", $scope.userConfig, config).
+      success(function(data, status, headers, config) {
+          $scope.modalLoading.hide();    
+          $state.go('tabs.sugestion');
+      }).
+      error(function(data, status, headers, config) {          
+        console.log("Erro ao atualizar usuario");
+        $scope.modalLoading.hide();
+      });
   }
 
   /*
@@ -128,64 +143,49 @@ angular.module('starter.controllers', ['starter.services'])
    * Author: Edian Comachio
    */     
   createUser = function(){
-    //headers
-    var config = {
-      headers:  {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'        
+      $scope.message = "Your taste is complex... We're creating your profile!";
+      
+      //headers
+      var config = {
+        headers:  {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'        
+        }
       }
-    }
 
-    //objeto usuario
-    $scope.userConfig = {
-      accessToken: window.localStorage['accessToken'],
-      id: $rootScope.userId
-    }
+      //objeto usuario
+      $scope.userConfig = {
+        accessToken: window.localStorage['accessToken'],
+        id: $rootScope.userId
+      }
 
-    console.log($scope.userConfig);
-
-    $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/create", $scope.userConfig, config).
-    success(function(data, status, headers, config) {
-      modalLoading.hide();
-      $state.go('tabs.sugestion');
-    }).
-    error(function(data, status, headers, config) {          
-      console.log("Erro ao criar usuario");
-      $ionicLoading.hide()
-    });
-  }
-
-  
-  $scope.checkIfUserExist =function(){
-      console.log("checkIfUserExist");
-      console.log(window.localStorage['accessToken']);
-      $scope.userConfig = {accessToken: window.localStorage['accessToken'],
-                           id: $rootScope.userId}
-      var config = {headers:  {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-          }
-      };                                   
-                           
-      $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/login", $scope.userConfig, config).
+      console.log($scope.userConfig);
+      
+      $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/create", $scope.userConfig, config).
       success(function(data, status, headers, config) {
-          $ionicLoading.hide()
-          $state.go('tabs.sugestion');
+        $scope.modalLoading.hide();
+        $state.go('tabs.sugestion');
       }).
       error(function(data, status, headers, config) {          
-          $ionicLoading.hide()
+        console.log("Erro ao criar usuario");
+        $ionicLoading.hide()
       });
-  };
+  }  
   
+  /*
+   * Name: fbLoginSuccess() 
+   * Description: Método reponsavel por gerenciar o callback da API do facebook - login com sucesso   
+   * Author: Edian Comachio
+   */     
   // This is the success callback from the login method
-    var fbLoginSuccess = function(response) {
+  var fbLoginSuccess = function(response) {
     if (!response.authResponse){
-      fbLoginError("Cannot find the authResponse");
-      return;
+        fbLoginError("Cannot find the authResponse");
+        return;
     }
 
     var authResponse = response.authResponse;
-
+    
     getFacebookProfileInfo(authResponse)
     .then(function(profileInfo) {
       // For the purpose of this example I will store user data on local storage
@@ -199,17 +199,27 @@ angular.module('starter.controllers', ['starter.services'])
       $ionicLoading.hide();
       $state.go('app.home');
     }, function(fail){
-      // Fail get profile info
-      console.log('profile info fail', fail);
+        // Fail get profile info
+        console.log('profile info fail', fail);
     });
   };
 
+  /*
+   * Name: fbLoginError() 
+   * Description: Método reponsavel por gerenciar o callback da API do facebook - falha no login
+   * Author: Edian Comachio
+   */
   // This is the fail callback from the login method
   var fbLoginError = function(error){
     console.log('fbLoginError', error);
     $ionicLoading.hide();
   };
 
+  /*
+   * Name: getFacebookProfileInfo() 
+   * Description: Método reponsavel por buscar o informções basicas do usuário através da API do facebook   
+   * Author: Edian Comachio
+   */
   // This method is to get the user profile info from the facebook api
   var getFacebookProfileInfo = function (authResponse) {
     var info = $q.defer();
@@ -227,11 +237,17 @@ angular.module('starter.controllers', ['starter.services'])
     return info.promise;
   };
 
+  /*
+   * Name: $scope.facebookSignIn() 
+   * Description: Método reponsavel por realizar a autenticação e o login através da API do facebook - Via dispositivo movel
+   * Author: Edian Comachio
+   */
   //This method is executed when the user press the "Login with facebook" button
   $scope.facebookSignIn = function() {
     
     console.log("AQUI facebookSignIn");
     $scope.modalLoading.show();
+    $scope.message = "Keep calm, we dont post anything on your Facebook";
     facebookConnectPlugin.getLoginStatus(function(success){
 
       if(success.status === 'connected'){
@@ -262,32 +278,25 @@ angular.module('starter.controllers', ['starter.services'])
 
             window.localStorage['userId'] = profileInfo.id;                  
 
-            if(checkIfUserExist())
-              updateUser()
-            else createUser();
-            
-;          }, function(fail){
+            checkIfUserExist();            
+
+           }, function(fail){
             // Fail get profile info
             console.log('profile info fail', fail);
           });
         }else{
-          console.log("aqui 1 edian");
           getFacebookProfileInfo(success.authResponse)
-          .then(function(profileInfo) {
-            console.log("aqui 2 edian");
-            console.log(profileInfo);
+          .then(function(profileInfo) {            
             $scope.user = profileInfo;
             $rootScope.userId = profileInfo.id;
             $rootScope.accessToken = profileInfo.accessToken;
-            console.log("aqui 3 edian");
+            
             window.localStorage['userId'] = profileInfo.id;
             
             console.log(window.localStorage['accessToken']);
-            console.log("aqui 4 edian");
-            if(checkIfUserExist())
-              updateUser()
-            else createUser();
-            console.log("aqui 5 edian");
+            
+            checkIfUserExist();
+            
           });
         }
       } else {
@@ -311,21 +320,29 @@ angular.module('starter.controllers', ['starter.services'])
                        'user_actions.fitness','public_profile'], fbLoginSuccess, fbLoginError);
       }
     });
-  };
-  /*-------------------------- FIM DAS COISA NOVA -----------------------*/
+  };  
 })
 
-.controller('ProfileCtrl', function ($scope, $state, $stateParams, WEBSERVICE_URL, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal) {  
+/*
+ * Controller: ProfileCtrl
+ * Description: Reposável pelo gerenciamento do perfil do usuário 
+ */     
+.controller('ProfileCtrl', function ($scope, $state, $stateParams, WEBSERVICE_URL, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading) {  
  
-    // Create the login modal that we will use later
+    /*inicializa modal dos perfis */
     $ionicModal.fromTemplateUrl('templates/profile.html', {
       scope: $scope
     }).then(function(modal) {
       $scope.modal = modal;
     });
-
-    $scope.getUserInfo = function(){        
-        
+    
+   /*
+    * Name: $scope.getUserInfo() 
+    * Description: Método reponsavel por buscar perfil do usuário no webservice.
+    * Author: Edian Comachio
+    * TODO - tratamento de erro do webservice
+    */ 
+    $scope.getUserInfo = function(){                
         var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
         $http({
             method: 'GET',
@@ -334,45 +351,74 @@ angular.module('starter.controllers', ['starter.services'])
              $scope.profile = response.data;          
              console.log("getUserInfo");
              console.log($scope.profile);
+             
+             // Open the login modal
+             $scope.modal.show();
+             $ionicLoading.hide();
+
           }, function errorCallback(response) {
               console.log("FALHA");
           // called asynchronously if an error occurs
           // or server returns response with an error status.
         });
-    }; 
-
-    console.log("$stateParams.profileId = " + $stateParams.idProfile);
-
+    };     
+    
+    //Nao lembro mais o que isso faz, mas funciona. TODO verificar possibilidade de retirar
     if($stateParams.idProfile==""||$stateParams.idProfile==undefined){
       var userId = window.localStorage['userId'] || 'semID';
     }else{
-      var userId =$stateParams.idProfile;
-    }
+      var userId = $stateParams.idProfile;
+    }    
 
-    //$scope.getUserInfo();
-
+   /*
+    * Name: $scope.repeatDone()
+    * Description: Método reponsavel por atualizar o sliderbox (não sei direito como)
+    * Author: Edian Comachio
+    * TODO - descobrir funcionamento correto do método
+    */ 
     $scope.repeatDone = function() {
       $ionicSlideBoxDelegate.update();
       //$ionicSlideBoxDelegate.slide($scope.week.length - 1, 1);
     };
 
+   /*
+    * Name: $scope.getLoggedUserProfile()
+    * Description: Método reponsavel por gerenciar os eventos da view e apresentar o loading.
+    * Author: Edian Comachio    
+    */     
     $scope.getLoggedUserProfile = function(){
-      console.log("e nois");
-      $scope.getUserInfo();
-      
-      // Open the login modal
-      $scope.modal.show();
+      $ionicLoading.show();
+      $scope.getUserInfo();     
     };    
 
-    //close modal 
+   /*
+    * Name: $scope.closeProfile()
+    * Description: Método reponsavel por fechar a modal com o perfil do usuário
+    * Author: Edian Comachio    
+    */     
     $scope.closeProfile = function() {
       $scope.modal.hide();      
     };  
 
 })
-
-.controller('SugestionCtrl', function ($scope, WEBSERVICE_URL, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state) {
+/*
+ * Controller: SugestionCtrl
+ * Description: Reposável pelo gerenciamento das sugestões do usuário 
+ */     
+.controller('SugestionCtrl', function ($scope, WEBSERVICE_URL, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $ionicLoading) {
     
+    /* inicializa a modal */
+    $ionicModal.fromTemplateUrl('templates/profile.html', {
+      scope: $scope
+    }).then(function(modal2) {
+      $scope.modal2 = modal2;
+    });
+
+   /*
+    * Name: $scope.closeProfile()
+    * Description: Método reponsavel por fechar atualizar as sugestoes do usuario através do webservice
+    * Author: Edian Comachio    
+    */     
     $scope.doRefreshSugestion = function(){
       
       var userId = window.localStorage['userId'] || 'semID';
@@ -387,41 +433,45 @@ angular.module('starter.controllers', ['starter.services'])
          });      
     }
 
-    // Create the login modal that we will use later
-    $ionicModal.fromTemplateUrl('templates/profile.html', {
-      scope: $scope
-    }).then(function(modal2) {
-      $scope.modal2 = modal2;
-    });
-
+   /*
+    * Name: $scope.getUserSugestion()
+    * Description: Método reponsavel por buscar as sugestões do usuário através do webservice
+    * Author: Edian Comachio    
+    */     
     $scope.getUserSugestion = function(){
-        
-        /* sugestion object 
-         * id = id facebook
-         * name = Nome          
-         * interestsInCommon = Interesses em comum com o usuário logado
-         * photos = foto da sugestão         
-         */
- 
-        console.log("chamando sugestion");
-        var userId = window.localStorage['userId'] || 'semID';
-        var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
-        $http({
+
+      $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 }); 
+
+      /* sugestion object 
+       * id = id facebook
+       * name = Nome          
+       * interestsInCommon = Interesses em comum com o usuário logado
+       * photos = foto da sugestão         
+       */        
+      var userId = window.localStorage['userId'] || 'semID';
+      var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
+      $http({
             method: 'GET',
             url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/sugestions' 
-         }).then(function successCallback(response) {          
-            console.log(response);
+       }).then(function successCallback(response) {          
+            $ionicLoading.hide();
             $scope.sugestions = response.data;            
-         }, function errorCallback(response) {
-              console.log("FALHA");
-            
-        });
+       }, function errorCallback(response) {
+            $ionicLoading.hide();
+            console.log("FALHA");            
+       });
     };
 
+    //Busca sugestões automaticamente ao abrir a tela de sugestões
     $scope.getUserSugestion();
 
+   /*
+    * Name: $scope.callSugestionProfile()
+    * Description: Método reponsavel por buscar o perfil das sugestões ao clicar no card, através do webservice
+    * Author: Edian Comachio    
+    */     
     $scope.callSugestionProfile = function(sugestion){                       
-      
+      $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 }); 
       console.log("callSugestionProfile");     
       console.log(sugestion);     
 
@@ -432,9 +482,10 @@ angular.module('starter.controllers', ['starter.services'])
        }).then(function successCallback(response) {
 
         $scope.profile = response.data;          
-        console.log($scope.profile);
 
         $scope.modal2.show();    
+        $ionicLoading.hide();
+
         }, function errorCallback(response) {
             console.log("FALHA");
         // called asynchronously if an error occurs
@@ -445,19 +496,25 @@ angular.module('starter.controllers', ['starter.services'])
      
     };
 
-    //close modal 
+    /*
+    * Name: $scope.closeProfile()
+    * Description: Método reponsavel por fechar a modal
+    * Author: Edian Comachio    
+    */     
     $scope.closeProfile = function() {
       $scope.modal2.hide();      
     }; 
 })
 
+//TODO - tirar do AppCtrl os metodos de login e passar pra cá
 .controller('LoginCtrl', function ($scope, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope) {
-  
+ 
+
+
 })
 
+//TODO - Avaliar se isso é usado em algum lugar
 .controller('MenuCtrl', function ($scope, WEBSERVICE_URL, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state) {
-
-  console.log("MenuCtrl");
 
   var userId = window.localStorage['userId'] || 'semID';
   var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
@@ -474,7 +531,9 @@ angular.module('starter.controllers', ['starter.services'])
   });
 })
 
+//TODO ver se isso é chamado em algum lugar
 .controller('HomeCtrl', function($scope, UserService, $ionicActionSheet, $state, $ionicLoading){
+  
   $scope.user = UserService.getUser();
 
   $scope.showLogOutMenu = function() {

@@ -73,7 +73,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-na
  
   $ionicConfigProvider.tabs.position("top");
 
-   $urlRouterProvider.otherwise('/login');
+  $urlRouterProvider.otherwise('/login');
 
 })
 

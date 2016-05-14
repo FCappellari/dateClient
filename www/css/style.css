@@ -100,7 +100,7 @@ body{
 
 .createLoading{
    background: url("blurground.jpg") no-repeat;  
-     -webkit-background-size: cover;
+  -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
@@ -134,7 +134,11 @@ body{
 }
 
 .loginScreen{
-   background: url("screen2.jpg") no-repeat;   
+   background: url("../img/night2.jpg") no-repeat;   
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
 }
 
 .loginLogo p {  
