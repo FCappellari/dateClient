@@ -1,19 +1,6 @@
-<!--
-  View: profile.html
-  Description: View responsável por aprensetar o perfil do usuário.
-  Author: Edian Comachio 
- -->
 <ion-modal-view>
   <ion-header-bar>
-    <div class="buttons">
-      <button class="button button-positive" ng-click="closeProfile()">
-         <i class="icon icon-left ion-arrow-left-c"></i>
-      </button>
-    </div>
-    <h1 class="title">{{profile.name}}</h1>
-    <button class="button button-positive" ng-click="editProfile()">
-         <i class="icon icon-left ion-edit"></i>
-    </button>
+    <h1 class="title">Editar</h1>
   </ion-header-bar>
   <ion-content>    
     <ion-slide-box on-slide-changed="slideHasChanged($index)" class="no-padding">
@@ -28,11 +15,12 @@
             <i class="icon icon-left ion-location profileDistance"> 22Km </i>           
         </span>      
       </ion-item>
-      <ion-item class="item item-text-wrap profileName">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu dictum eros. Nullam tincidunt consectetur orci, vel mollis tellus auctor nec. Nunc egestas aliquet vulputate. Donec ac dolor vehicula, lobortis lacus non, pharetra quam. Cras ac dui auctor, tincidunt neque non, elementum tortor.  
-         </p>
-      </ion-item>
-      <ion-item class="item item-text-wrap profileName">
+      <label class="item item-input item-floating-label">
+        <span class="input-label">A little about yourself</span>
+        <input type="text" placeholder="A little about yourself">
+      </label>            
+
+      <ion-item class="item item-text-wrap ">
             <button class="button button-large  button-clear button-positive  ion-social-twitter-outline"></button>
             <button class="button button-large  button-clear button-positive ion-social-facebook"></button>
             <button class="button button-large button-clear button-positive  ion-social-snapchat-outline "></button>
@@ -42,6 +30,15 @@
             <button class="button button-large  button-clear button-positive ion-social-googleplus"></button>
             <button class="button button-large button-clear button-positive ion-social-pinterest"></button>
       </ion-item>
-    </ion-list>       
-  </ion-content>                      
+
+      <button class="button button-block button-positive" ng-click="showSocialLinks()">Edit Social links</button>      
+
+      <ion-item class="item item-text-wrap profileName">
+         <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu dictum eros. Nullam tincidunt consectetur orci, vel mollis tellus auctor nec. Nunc egestas aliquet vulputate. Donec ac dolor vehicula, lobortis lacus non, pharetra quam. Cras ac dui auctor, tincidunt neque non, elementum tortor.  
+         </p>
+      </ion-item>
+      
+    </ion-list>      
+  </ion-content>
 </ion-modal-view>

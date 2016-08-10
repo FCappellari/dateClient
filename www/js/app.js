@@ -67,6 +67,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-na
           templateUrl: 'templates/sugestion.html',
            controller: 'SugestionCtrl'
         }
+      }      
+    })
+   .state('tabs.matches', {
+      url: '/matches',
+      views: {
+        'matches-tab': {
+          templateUrl: 'templates/matches.html',
+           controller: 'MatchesCtrl'
+        }
       }
     });
    

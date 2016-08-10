@@ -1,8 +1,8 @@
 angular.module('starter.controllers', ['starter.services'])
 
 //.constant('WEBSERVICE_URL', 'localhost:8080')
-.constant('WEBSERVICE_URL', '52.34.48.120:8180')
-//.constant('WEBSERVICE_URL', '192.168.25.8:8080')
+//.constant('WEBSERVICE_URL', '52.34.48.120:8180')
+.constant('WEBSERVICE_URL', '192.168.25.7:8080')
 
 /*
  * Controller: AppCrtl
@@ -37,10 +37,7 @@ angular.module('starter.controllers', ['starter.services'])
    * Description: Método reponsavel pela autenticacao do facebook via browser 
    * Author: Edian Comachio
    */
-  $scope.fbLogin = function () {   
-
-    $scope.modalLoading.show();
-    $scope.message = "Keep calm, we dont post anything on your Facebook";
+  $scope.fbLogin = function () {       
   
     ngFB.login({
                 scope: 'user_birthday,user_religion_politics,user_relationships,user_relationship_details,user_hometown,' +
@@ -49,6 +46,10 @@ angular.module('starter.controllers', ['starter.services'])
                        'user_tagged_places,user_posts,user_actions.books,user_actions.music,user_actions.video,user_actions.news,'+
                        'user_actions.fitness,public_profile'}).then(
         function (response) {
+            
+            $scope.modalLoading.show();            
+            $scope.message = "Keep calm, we dont post anything on your Facebook";
+
             if (response.status === 'connected') {
                 console.log(response.authResponse.accessToken);
                 window.localStorage['accessToken'] = response.authResponse.accessToken;          
@@ -243,9 +244,8 @@ angular.module('starter.controllers', ['starter.services'])
    * Author: Edian Comachio
    */
   //This method is executed when the user press the "Login with facebook" button
-  $scope.facebookSignIn = function() {
+  $scope.facebookSignIn = function() {    
     
-    console.log("AQUI facebookSignIn");
     $scope.modalLoading.show();
     $scope.message = "Keep calm, we dont post anything on your Facebook";
     facebookConnectPlugin.getLoginStatus(function(success){
@@ -324,11 +324,69 @@ angular.module('starter.controllers', ['starter.services'])
 })
 
 /*
+ * Controller: SettingsCtrl
+ * Description: Reposável pelo gerenciamento do perfil do usuário 
+ */     
+.controller('SettingsCtrl', function ($scope, $state, $stateParams, WEBSERVICE_URL, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading) {  
+
+    $scope.settings = {'distance':0,
+                       'beginAge':0,
+                       'finalAge':0
+                      };
+
+    /*inicializa modal dos perfis */
+    $ionicModal.fromTemplateUrl('templates/settings.html', {
+      scope: $scope
+    }).then(function(modal) {
+      $scope.modal = modal;
+    });  
+
+    /*inicializa modal de erro */
+    $ionicModal.fromTemplateUrl('templates/errorDefaultPage.html', {
+      scope: $scope
+    }).then(function(modalErro) {
+      $scope.modalErro = modalErro;
+    });
+
+   /*
+    * Name: $scope.getLoggedUserProfile()
+    * Description: Método reponsavel por gerenciar os eventos da view e apresentar o loading.
+    * Author: Edian Comachio    
+
+    $scope.getLoggedUserProfile = function(){
+      $ionicLoading.show();
+      $scope.getUserInfo();     
+    };  
+    */     
+   /*
+    * Name: $scope.getUserSettings() 
+    * Description: Método reponsavel por buscar as configurações do usuário no webservice.
+    * Author: Edian Comachio
+    * TODO - tratamento de erro do webservice
+    */ 
+    $scope.getUserSettings = function(){
+       console.log("asdasd");
+       // Open the profile modal
+       $scope.modal.show();
+       $ionicLoading.hide();
+     };
+
+
+})
+
+/*
  * Controller: ProfileCtrl
  * Description: Reposável pelo gerenciamento do perfil do usuário 
  */     
 .controller('ProfileCtrl', function ($scope, $state, $stateParams, WEBSERVICE_URL, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading) {  
  
+    /*inicializa modal para edicao dos perfis */
+    $ionicModal.fromTemplateUrl('templates/editProfile.html', {
+      scope: $scope
+    }).then(function(modalEditProfile) {
+      $scope.modalEditProfile = modalEditProfile;
+    });    
+
     /*inicializa modal dos perfis */
     $ionicModal.fromTemplateUrl('templates/profile.html', {
       scope: $scope
@@ -336,6 +394,13 @@ angular.module('starter.controllers', ['starter.services'])
       $scope.modal = modal;
     });
     
+    /*inicializa modal de erro */
+    $ionicModal.fromTemplateUrl('templates/errorDefaultPage.html', {
+      scope: $scope
+    }).then(function(modalErro) {
+      $scope.modalErro = modalErro;
+    });
+
    /*
     * Name: $scope.getUserInfo() 
     * Description: Método reponsavel por buscar perfil do usuário no webservice.
@@ -352,17 +417,26 @@ angular.module('starter.controllers', ['starter.services'])
              console.log("getUserInfo");
              console.log($scope.profile);
              
-             // Open the login modal
+             // Open the profile modal
              $scope.modal.show();
              $ionicLoading.hide();
 
           }, function errorCallback(response) {
-              console.log("FALHA");
+             $scope.modalErro.show();
+             $ionicLoading.hide();              
           // called asynchronously if an error occurs
           // or server returns response with an error status.
         });
     };     
     
+    $scope.editProfile = function(){
+      
+      // Open the profile modal
+      $scope.modalEditProfile.show();
+      $ionicLoading.hide();      
+
+    }
+
     //Nao lembro mais o que isso faz, mas funciona. TODO verificar possibilidade de retirar
     if($stateParams.idProfile==""||$stateParams.idProfile==undefined){
       var userId = window.localStorage['userId'] || 'semID';
@@ -400,7 +474,49 @@ angular.module('starter.controllers', ['starter.services'])
       $scope.modal.hide();      
     };  
 
+   /*
+    * Name: $scope.closeError()
+    * Description: Método reponsavel por fechar a modal com o Erro
+    * Author: Edian Comachio    
+    */     
+    $scope.closeError = function() {
+      console.log("errorclose");
+      $scope.modalErro.hide();      
+    };  
+
 })
+
+.controller('MatchesCtrl', function ($scope, WEBSERVICE_URL, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $ionicLoading) {
+  
+    $scope.getUserSugestion = function(){
+
+      $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 }); 
+
+      /* sugestion object 
+       * id = id facebook
+       * name = Nome          
+       * interestsInCommon = Interesses em comum com o usuário logado
+       * photos = foto da sugestão         
+       */        
+      var userId = window.localStorage['userId'] || 'semID';
+      var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
+      $http({
+            method: 'GET',
+            url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/sugestions' 
+       }).then(function successCallback(response) {          
+            $ionicLoading.hide();
+            console.log(response.data);
+            $scope.sugestions = response.data;            
+       }, function errorCallback(response) {
+            $ionicLoading.hide();
+            console.log("FALHA");            
+       });
+    };
+
+    //Busca sugestões automaticamente ao abrir a tela de sugestões
+    $scope.getUserSugestion();  
+})
+
 /*
  * Controller: SugestionCtrl
  * Description: Reposável pelo gerenciamento das sugestões do usuário 
