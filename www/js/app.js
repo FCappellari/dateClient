@@ -1,9 +1,9 @@
-// Ionic Starter App
+ // Ionic Starter App
 
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-native-transitions'])
+angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-native-transitions', 'chart.js'])
 
 .run(function ($ionicPlatform, ngFB) {  
   ngFB.init({appId: '973158726110069'});
@@ -20,6 +20,16 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-na
   });
 })
 
+.constant( 'config', {
+    //
+    // Get your PubNub API Keys in the link above.
+    // Senha PubNub Totvs@123
+    //
+    "pubnub": {
+        "publish-key"   : "pub-c-48850936-e46f-454d-91bf-37719fcdadde",
+        "subscribe-key" : "sub-c-2571490a-6267-11e6-962a-02ee2ddab7fe"
+    }
+})
 
 .config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
 
@@ -85,7 +95,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-na
   $urlRouterProvider.otherwise('/login');
 
 })
-
 .controller('LoginCtrl', function($scope, $state) {
   
   $scope.signIn = function(user) {

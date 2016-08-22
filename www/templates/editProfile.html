@@ -1,12 +1,15 @@
-<ion-modal-view>
-  <ion-header-bar>
-    <h1 class="title">Editar</h1>
-  </ion-header-bar>
-  <ion-content>    
+<ion-modal-view>  
+  <ion-content>   
+    <button class="button button-clear button-top-left" ng-click="closeEditProfile()">
+         <i class="icon icon-left ion-android-arrow-back"></i>
+     </button>
+     <button class="button button-clear button-top-right" ng-click="editProfile()">
+         <i class="icon icon-left ion-compose"></i>
+    </button> 
     <ion-slide-box on-slide-changed="slideHasChanged($index)" class="no-padding">
       <ion-slide ng-repeat="photo in profile.photos" repeat-done="repeatDone()">                
           <img ng-src="{{photo}}" height="400" width="400">                      
-      </ion-slide>               
+      </ion-slide>      
     </ion-slide-box>    
     <ion-list>
       <ion-item class="item item-text-wrap profileName">
@@ -31,13 +34,7 @@
             <button class="button button-large button-clear button-positive ion-social-pinterest"></button>
       </ion-item>
 
-      <button class="button button-block button-positive" ng-click="showSocialLinks()">Edit Social links</button>      
-
-      <ion-item class="item item-text-wrap profileName">
-         <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu dictum eros. Nullam tincidunt consectetur orci, vel mollis tellus auctor nec. Nunc egestas aliquet vulputate. Donec ac dolor vehicula, lobortis lacus non, pharetra quam. Cras ac dui auctor, tincidunt neque non, elementum tortor.  
-         </p>
-      </ion-item>
+      <button class="button button-block button-positive" ng-click="editSocialLinks()">Edit Social links</button>           
       
     </ion-list>      
   </ion-content>

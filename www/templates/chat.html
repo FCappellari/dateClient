@@ -1,0 +1,44 @@
+<ion-modal-view ng-controller="ChatCtrl">
+  <ion-header-bar>
+    <div class="buttons">
+      <button class="button button-positive" ng-click="closeChat()">
+         <i class="icon icon-left ion-arrow-left-c"></i>
+      </button>
+    </div>
+    <h1 class="title">{{profile.name}}</h1>    
+  </ion-header-bar>
+  <ion-content class="outWithHasTabsTop">    
+        <div class="chat-container" ng-controller="ChatCtrl as chat">
+
+        <!-- =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -->
+        <!-- Chat Messages -->
+        <!-- =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -->
+        <div class="chat-messages">
+            <div class="chat-header">
+                <div class="angularjs-chat-logo item-avatar">
+                	<img src="{{sugestions[10].profilePic}}" ng-click="callMatchProfile(sugestions[10])">
+                </div>
+                Marina Comachio
+            </div>
+            <div ng-repeat="message in chat.messages">
+                <div class="sent-message-{{ message.self }}">
+                    <span class="username">{{ message.user.name }}:</span>
+                    {{ message.data }}
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+
+        <!-- =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -->
+        <!-- User Input -->
+        <!-- =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -->
+        <form ng-submit="chat.send()" class="chat-input">
+            <input type="text" ng-model="chat.textbox" autofocus>
+            <input type="submit" class="send-icon" value=" ">
+            <input type="submit" value=" "
+                class="sent-indicator {{ chat.status }}">
+        </form>
+
+    </div>
+  </ion-content>
+</ion-modal-view>

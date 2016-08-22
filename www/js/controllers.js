@@ -1,8 +1,8 @@
-angular.module('starter.controllers', ['starter.services'])
+angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
 
-//.constant('WEBSERVICE_URL', 'localhost:8080')
+.constant('WEBSERVICE_URL', 'localhost:8080')
 //.constant('WEBSERVICE_URL', '52.34.48.120:8180')
-.constant('WEBSERVICE_URL', '192.168.25.7:8080')
+//.constant('WEBSERVICE_URL', '192.168.25.3:8080')
 
 /*
  * Controller: AppCrtl
@@ -51,8 +51,10 @@ angular.module('starter.controllers', ['starter.services'])
             $scope.message = "Keep calm, we dont post anything on your Facebook";
 
             if (response.status === 'connected') {
+                console.log(response.status);
                 console.log(response.authResponse.accessToken);
                 window.localStorage['accessToken'] = response.authResponse.accessToken;          
+
                 $scope.getFbUser();                
             } else {
                 alert('Facebook login failed');
@@ -75,8 +77,9 @@ angular.module('starter.controllers', ['starter.services'])
       $rootScope.userId = user.id;
       $rootScope.accessToken = user.accessToken;
       window.localStorage['userId'] = user.id;     
-
+      console.log(user);
       checkIfUserExist();     
+      
     },
     function (error) {
       alert('Facebook error: ' + error.error_description);
@@ -93,8 +96,7 @@ angular.module('starter.controllers', ['starter.services'])
       $http({
         method: 'GET',
         url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + $rootScope.userId +'/exists' 
-      }).then(function successCallback(response) {   
-        console.log(response.data);
+      }).then(function successCallback(response) {           
         if(response.data){
             updateUser();
         }else{
@@ -364,13 +366,11 @@ angular.module('starter.controllers', ['starter.services'])
     * Author: Edian Comachio
     * TODO - tratamento de erro do webservice
     */ 
-    $scope.getUserSettings = function(){
-       console.log("asdasd");
+    $scope.getUserSettings = function(){       
        // Open the profile modal
        $scope.modal.show();
        $ionicLoading.hide();
      };
-
 
 })
 
@@ -387,6 +387,20 @@ angular.module('starter.controllers', ['starter.services'])
       $scope.modalEditProfile = modalEditProfile;
     });    
 
+    /*inicializa modal para edicao dos perfis */
+    $ionicModal.fromTemplateUrl('templates/editSocialLinks.html', {
+      scope: $scope
+    }).then(function(modalEditSocialLinks) {
+      $scope.modalEditSocialLinks = modalEditSocialLinks;
+    });    
+
+    /*inicializa modal para edicao de um link social */
+    $ionicModal.fromTemplateUrl('templates/socialSetting.html', {
+      scope: $scope
+    }).then(function(modalSocialSetting) {
+      $scope.modalSocialSetting = modalSocialSetting;
+    });    
+
     /*inicializa modal dos perfis */
     $ionicModal.fromTemplateUrl('templates/profile.html', {
       scope: $scope
@@ -401,6 +415,18 @@ angular.module('starter.controllers', ['starter.services'])
       $scope.modalErro = modalErro;
     });
 
+    $scope.editSocialLinks = function(){
+        $scope.modalEditSocialLinks.show();
+    }
+
+    $scope.editSocialSetting = function(){
+        $scope.modalSocialSetting.show();
+    }
+
+    $scope.editSocialLinks = function(){
+        $scope.modalEditSocialLinks.show();
+    }
+
    /*
     * Name: $scope.getUserInfo() 
     * Description: Método reponsavel por buscar perfil do usuário no webservice.
@@ -412,11 +438,10 @@ angular.module('starter.controllers', ['starter.services'])
         $http({
             method: 'GET',
             url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/profile' 
-         }).then(function successCallback(response) {                        
+         }).then(function successCallback(response) { 
+             console.log(response);
              $scope.profile = response.data;          
-             console.log("getUserInfo");
-             console.log($scope.profile);
-             
+
              // Open the profile modal
              $scope.modal.show();
              $ionicLoading.hide();
@@ -474,6 +499,24 @@ angular.module('starter.controllers', ['starter.services'])
       $scope.modal.hide();      
     };  
 
+    /*
+    * Name: $scope.closeProfile()
+    * Description: Método reponsavel por fechar a modal com o perfil do usuário
+    * Author: Edian Comachio    
+    */     
+    $scope.closeEditProfile = function() {      
+      $scope.modalEditProfile.hide();      
+    };  
+
+    /*
+    * Name: $scope.closeEditSocialLinks()
+    * Description: Método reponsavel por fechar a modal das redes socias
+    * Author: Edian Comachio    
+    */     
+    $scope.closeEditSocialLinks = function() {      
+      $scope.modalEditSocialLinks.hide();      
+    };  
+
    /*
     * Name: $scope.closeError()
     * Description: Método reponsavel por fechar a modal com o Erro
@@ -488,6 +531,26 @@ angular.module('starter.controllers', ['starter.services'])
 
 .controller('MatchesCtrl', function ($scope, WEBSERVICE_URL, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $ionicLoading) {
   
+    /* inicializa a modal */
+    $ionicModal.fromTemplateUrl('templates/chat.html', {
+      scope: $scope
+    }).then(function(modalChat) {
+      $scope.modalChat = modalChat;
+    });
+
+    $ionicModal.fromTemplateUrl('templates/matchDetail.html', {
+      scope: $scope
+    }).then(function(modalMatchDetail) {
+      $scope.modalMatchDetail = modalMatchDetail;
+    });    
+
+    /* inicializa a modal */
+    $ionicModal.fromTemplateUrl('templates/profile.html', {
+      scope: $scope
+    }).then(function(modalProfile) {
+      $scope.modalProfile = modalProfile;
+    });
+
     $scope.getUserSugestion = function(){
 
       $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 }); 
@@ -512,9 +575,74 @@ angular.module('starter.controllers', ['starter.services'])
             console.log("FALHA");            
        });
     };
+    
+    $scope.callMatchProfile = function(match){                       
+      $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 }); 
+      console.log("callMatchProfile");     
+      console.log(match);     
+
+      var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
+      $http({
+          method: 'GET',
+          url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + match.id +'/profile' 
+       }).then(function successCallback(response) {
+
+        $scope.profile = response.data;          
+
+        $scope.modalProfile.show();
+        $ionicLoading.hide();
+
+        }, function errorCallback(response) {
+            console.log("FALHA");
+        // called asynchronously if an error occurs
+        // or server returns response with an error status.
+      });        
+      
+      // Open the login modal
+     
+    };
+
+    $scope.getMatchDetails = function(){       
+       $scope.modalMatchDetail.show();               
+       $scope.buildGraph();
+    };
+
+    $scope.chat = function(){         
+       $scope.modalChat.show();
+    };
+
+    $scope.closeMatchDetail = function() {
+      $scope.modalMatchDetail.hide();      
+    }; 
+
+    $scope.closeProfile = function() {
+      $scope.modalProfile.hide();      
+    }; 
+
+    $scope.buildGraph = function(){  
+      //doughnut
+      $scope.doughnut = {};                  
+      $scope.doughnut.visible = true;            
+      $scope.doughnut.data = [[80, 75, 95, 27, 97]];
+      $scope.doughnut.labels = ["music", "Places", "Books", "Movies", "Sports"];    
+      $scope.doughnut.series = ['Series']
+      //$scope.doughnut.colours;
+      $scope.doughnut.legend = true;
+
+      //line
+      $scope.line = {};                  
+      $scope.line.labels = ["music", "Places", "Books", "Movies", "Sports"];
+      $scope.line.series = ['Series A'];
+      $scope.line.data = [
+        [80, 75, 95, 27, 97]        
+      ];
+      
+      $scope.line.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];      
+      
+    };
 
     //Busca sugestões automaticamente ao abrir a tela de sugestões
-    $scope.getUserSugestion();  
+    //$scope.getUserSugestion();  
 })
 
 /*
@@ -522,12 +650,13 @@ angular.module('starter.controllers', ['starter.services'])
  * Description: Reposável pelo gerenciamento das sugestões do usuário 
  */     
 .controller('SugestionCtrl', function ($scope, WEBSERVICE_URL, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $ionicLoading) {
-    
+   
+
     /* inicializa a modal */
     $ionicModal.fromTemplateUrl('templates/profile.html', {
       scope: $scope
-    }).then(function(modal2) {
-      $scope.modal2 = modal2;
+    }).then(function(modalProfile) {
+      $scope.modalProfile = modalProfile;
     });
 
    /*
@@ -596,10 +725,10 @@ angular.module('starter.controllers', ['starter.services'])
           method: 'GET',
           url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + sugestion.id +'/profile' 
        }).then(function successCallback(response) {
-
+        console.log(response)
         $scope.profile = response.data;          
 
-        $scope.modal2.show();    
+        $scope.modalProfile.show();    
         $ionicLoading.hide();
 
         }, function errorCallback(response) {
@@ -618,7 +747,7 @@ angular.module('starter.controllers', ['starter.services'])
     * Author: Edian Comachio    
     */     
     $scope.closeProfile = function() {
-      $scope.modal2.hide();      
+      $scope.modalProfile.hide();      
     }; 
 })
 
@@ -638,6 +767,8 @@ angular.module('starter.controllers', ['starter.services'])
       method: 'GET',
       url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/profile' 
    }).then(function successCallback(response) {                        
+       console.log("AQUI JESUS");
+       console.log(response);
        $scope.profile = response.data;                 
        console.log($scope.profile);
     }, function errorCallback(response) {
@@ -698,3 +829,90 @@ angular.module('starter.controllers', ['starter.services'])
     setUser: setUser
   };
 })
+
+.controller( 'ChatCtrl', [ 'Messages','$scope','$ionicModal','WEBSERVICE_URL', '$timeout','$stateParams','$http','$rootScope','$state', '$ionicLoading',
+                  function( Messages, $scope, $ionicModal, WEBSERVICE_URL, $timeout, $stateParams, $http, $rootScope, $state, $ionicLoading ){
+    
+    /* inicializa a modal */
+    $ionicModal.fromTemplateUrl('templates/profile.html', {
+      scope: $scope
+    }).then(function(modalProfile) {
+      $scope.modalProfile = modalProfile;
+    });
+
+    // Message Inbox
+        // Self Object
+    var chat = this;
+
+    // Sent Indicator
+    chat.status = "";
+
+    // Keep an Array of Messages
+    chat.messages = [];
+
+    // Set User Data
+
+    Messages.user({ name : "teste" });
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // Get Received Messages and Add it to Messages Array.
+    // This will automatically update the view.
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    var chatmessages = document.querySelector(".chat-messages");
+    Messages.receive(function(msg){
+        console.log(msg);
+        chat.messages.push(msg);
+        setTimeout( function() {
+            chatmessages.scrollTop = chatmessages.scrollHeight;
+        }, 10 );
+    });
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // Send Messages
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    chat.send = function() {
+        Messages.send({ data : chat.textbox });
+        chat.status = "sending";
+        chat.textbox = "";
+        setTimeout( function() { chat.status = "" }, 1200 );
+    };
+
+    $scope.closeProfile = function() {       
+       $scope.modalProfile.hide();
+    };
+    
+    $scope.closeChat = function() {       
+       $scope.modalChat.hide();
+    };
+
+    /*
+    * Name: $scope.callSugestionProfile()
+    * Description: Método reponsavel por buscar o perfil das sugestões ao clicar no card, através do webservice
+    * Author: Edian Comachio    
+    */     
+    $scope.callMatchProfile = function(match){                       
+      $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 }); 
+      console.log("callMatchProfile");     
+      console.log(match);     
+
+      var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
+      $http({
+          method: 'GET',
+          url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + match.id +'/profile' 
+       }).then(function successCallback(response) {
+
+        $scope.profile = response.data;          
+
+        $scope.modalProfile.show();
+        $ionicLoading.hide();
+
+        }, function errorCallback(response) {
+            console.log("FALHA");
+        // called asynchronously if an error occurs
+        // or server returns response with an error status.
+      });        
+      
+      // Open the login modal
+     
+    };
+} ] )

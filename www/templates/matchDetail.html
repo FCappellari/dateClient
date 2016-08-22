@@ -1,0 +1,62 @@
+<!--
+  View: matchDetail.html
+  Description: View responsável por aprensetar os detalhes da combinação.
+  Author: Edian Comachio 
+ -->
+<ion-modal-view ng-contrller="MatchesCtrl">
+  <ion-header-bar>
+    <div class="buttons">
+      <button class="button button-positive" ng-click="closeMatchDetail()">
+         <i class="icon icon-left ion-arrow-left-c"></i>
+      </button>
+    </div>
+    <h1 class="title">Match Detail</h1>    
+  </ion-header-bar>
+  <ion-content class=" outWithHasTabsTop detailBG" ng-init="buildGraph()">    
+    <!--<div class="rateTitle">        
+      <h1 id="rateTitleh1">{{sugestions[10].name}}</h1>
+    </div>-->
+    <div class="percentageContainer">          
+      <div id="percentage">
+        <p>87%</p>
+      </div>      
+    </div>    
+    <h1 class="detailTitle A7CCED">Charts</h1>
+    <div class="card chart">      
+      <canvas id="doughnut" class="chart chart-doughnut"
+              chart-data="doughnut.data" chart-labels="doughnut.labels">
+      </canvas> 
+    </div>
+    <div class="card chart">
+      <canvas id="line" class="chart chart-line" chart-data="line.data"
+              chart-labels="line.labels" chart-series="line.series" chart-options="line.options"
+              chart-dataset-override="datasetOverride" chart-click="onClick"
+      </canvas> 
+    </div>
+    <div class="bestInterest">
+      <p class="detailTitle 00A5CF">Interests Ranking<p>
+      <h1>SPORTS</h1>
+      <h2>MUSIC</h2>
+      <h3>BOOKS</h3>
+      <h4>PLACES</h4>
+      <h5>MOVIES</h5>
+    </div>
+    <div class="profile">
+      <div id="profile-info">
+          <img id="profile-image" src="{{sugestions[10].profilePic}}">
+      </div>
+      <h1 class="profileTitle A7CCED">{{sugestions[10].name}}</h1>
+      <div class="profileButtons">
+        <button class="button button-block button-positive" ng-click="chat()">
+            Send a message!
+        </button>
+        <button class="button button-block button-royal" ng-click="callMatchProfile(sugestions[10])">
+            Go to the profile!
+        </button>
+        <button class="button button-block button-assertive">
+            Social Links
+        </button>
+      </div>
+    </div>
+  </ion-content>                      
+</ion-modal-view>

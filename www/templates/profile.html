@@ -4,7 +4,7 @@
   Author: Edian Comachio 
  -->
 <ion-modal-view>
-  <ion-header-bar>
+  <!--<ion-header-bar>
     <div class="buttons">
       <button class="button button-positive" ng-click="closeProfile()">
          <i class="icon icon-left ion-arrow-left-c"></i>
@@ -14,8 +14,14 @@
     <button class="button button-positive" ng-click="editProfile()">
          <i class="icon icon-left ion-edit"></i>
     </button>
-  </ion-header-bar>
+  </ion-header-bar>-->
   <ion-content>    
+    <button class="button button-clear button-top-left" ng-click="closeProfile()">
+         <i class="icon icon-left ion-android-arrow-back"></i>
+     </button>
+     <button class="button button-clear button-top-right" ng-click="editProfile()">
+         <i class="icon icon-left ion-compose"></i>
+    </button>
     <ion-slide-box on-slide-changed="slideHasChanged($index)" class="no-padding">
       <ion-slide ng-repeat="photo in profile.photos" repeat-done="repeatDone()">                
           <img ng-src="{{photo}}" height="400" width="400">                      
@@ -41,7 +47,7 @@
             <button class="button button-large button-clear button-positive  ion-social-youtube "></button>
             <button class="button button-large  button-clear button-positive ion-social-googleplus"></button>
             <button class="button button-large button-clear button-positive ion-social-pinterest"></button>
-      </ion-item>
-    </ion-list>       
+      </ion-item>      
+    </ion-list>         
   </ion-content>                      
 </ion-modal-view>
