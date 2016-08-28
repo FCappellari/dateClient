@@ -360,7 +360,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 
     $scope.settings = {'distance':0,
                        'beginAge':0,
-                       'finalAge':0
+                       'finalAge':100
                       };
 
     /*inicializa modal dos perfis */
@@ -399,6 +399,15 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
        $ionicLoading.hide();
      };
 
+     $scope.save = function(){
+       /* TODO chamar webservice para salvar as confugurações */
+       swal("Alright!", "Everything saved!", "success");
+       $scope.modal.hide();
+     }
+
+     $scope.closeSettings = function(){
+        $scope.modal.hide();
+     }
 })
 
 .controller('cropImageController' , function ($scope, $state, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading, $cordovaImagePicker, $interval) {  
@@ -423,7 +432,10 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
      $ionicLoading.hide();
      $scope.profile.photos[$scope.imageFromGallery.profileIndex] = $scope.auxImg;
      $ionicSlideBoxDelegate.$getByHandle('editSlide').update();
+     swal("Alright!", "Everything saved!", "success");
      $scope.closeCropModal();
+     
+
      /* TODO
         chamar o webservice para salvar a foto com o objeto imageFromGallery
       */
@@ -439,7 +451,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     * Description: Método reponsavel por fechar a modal com o perfil do usuário
     * Author: Edian Comachio    
     */     
-    $scope.closeCropModal = function() {
+    $scope.closeCropModal = function() {      
       $scope.modaleditPhoto.hide();      
     };  
 
@@ -477,7 +489,24 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
         $scope.modalSocialSetting.show();
     }
 
-    
+    $scope.closeSocialSetting = function(){    
+      $scope.modalSocialSetting.hide();
+    }    
+
+    /*
+    * Name: $scope.closeEditSocialLinks()
+    * Description: Método reponsavel por fechar a modal das redes socias
+    * Author: Edian Comachio    
+    */     
+    $scope.closeEditSocialLinks = function() {      
+      $scope.modalEditSocialLinks.hide();      
+    };  
+
+    $scope.saveSocialLink = function(){
+      /* TODO chamar webservice para salvar a link social */
+      $scope.modalSocialSetting.hide();      
+      swal("Alright!", "Everything saved!", "success");
+    }
 
     $scope.editPhoto = function(){
 
@@ -660,15 +689,6 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     */     
     $scope.closeEditProfile = function() {      
       $scope.modalEditProfile.hide();      
-    };  
-
-    /*
-    * Name: $scope.closeEditSocialLinks()
-    * Description: Método reponsavel por fechar a modal das redes socias
-    * Author: Edian Comachio    
-    */     
-    $scope.closeEditSocialLinks = function() {      
-      $scope.modalEditSocialLinks.hide();      
     };  
 
    /*
