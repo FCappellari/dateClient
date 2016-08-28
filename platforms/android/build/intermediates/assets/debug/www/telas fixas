@@ -1,0 +1,93 @@
+    <ion-pane>
+      <ion-header-bar class="bar-positive">
+        <h1 class="title">Date v1</h1>
+      </ion-header-bar>      
+
+      <ion-tabs class="tabs-positive tabs-icon-only tabs-top tabs-striped">
+        <ion-tab title="Profile" icon="ion-android-person">
+          <ion-nav-view>
+            <ion-content>
+                <ion-slide-box on-slide-changed="slideHasChanged($index)" class="no-padding">
+                  <ion-slide>                
+                      <img src="http://images6.fanpop.com/image/photos/33900000/Adorable-Vicky-victoria-justice-33910425-500-500.jpg">
+                  </ion-slide>               
+                  <ion-slide>                   
+                      <img src="http://media.tumblr.com/tumblr_leyy9lV2nS1qbolbh.jpg">
+                  </ion-slide>                              
+                  <ion-slide>                   
+                      <img src="http://41.media.tumblr.com/eaaaba1d1295cb08e60c0418785704bf/tumblr_nkv3ldjrWn1rids08o1_500.jpg">
+                  </ion-slide>  
+                  <ion-slide>                   
+                      <img src="http://media.tumblr.com/tumblr_leyy9lV2nS1qbolbh.jpg">
+                  </ion-slide>    
+                </ion-slide-box>                  
+                <ion-list>
+                  <ion-item class="item item-text-wrap profileName">
+                    <h2>Victoria, 22</h2>
+                    <span>
+                        <!--
+                        <i class="icon icon-left ion-location profileDistance"> 22Km </i> 
+                      -->
+                    </span>      
+                  </ion-item>
+                  <ion-item class="item item-text-wrap profileName">
+                     <p>
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eu dictum eros. Nullam tincidunt consectetur orci, vel mollis tellus auctor nec. Nunc egestas aliquet vulputate. Donec ac dolor vehicula, lobortis lacus non, pharetra quam. Cras ac dui auctor, tincidunt neque non, elementum tortor.  
+                     </p>
+                  </ion-item>
+                  <ion-item class="item item-text-wrap profileName">
+                        <button class="button button-large  button-clear button-positive  ion-social-twitter-outline"></button>
+                        <button class="button button-large  button-clear button-positive ion-social-facebook"></button>
+                        <button class="button button-large button-clear button-positive  ion-social-snapchat-outline "></button>
+                        <button class="button button-large  button-clear button-positive ion-social-instagram-outline"></button>
+                        <button class="button button-large button-clear button-positive ion-social-whatsapp-outline"></button>                    
+                        <button class="button button-large button-clear button-positive  ion-social-youtube "></button>
+                        <button class="button button-large  button-clear button-positive ion-social-googleplus"></button>
+                        <button class="button button-large button-clear button-positive ion-social-pinterest"></button>
+                  </ion-item>
+                </ion-list>                              
+            </ion-content>           
+           </ion-nav-view>
+          </ion-tab>
+
+          <ion-tab title="Sugestions" icon="ion-help">
+            <ion-nav-view>
+              <ion-content class="has-tabs has-header">
+                <ion-list>                  
+                  <div class="list card">
+                    <div class="item">                     
+                      <h1>Victoria, 22</h1>                      
+                    </div>
+                    <div class="item item-image">
+                      <img src="http://www.celebzz.com/wp-content/uploads/2014/01/victoria-justice-twitter-instagram-and-personal-pics-_3.jpg">
+                    </div>                   
+                    <div class="button-bar padding-top">
+                      <button class="icon ion-close-round button button-large button-clear button-balanced"></button>
+                      <button class="icon ion-ios-heart button button-large button-clear button-assertive"></button>
+                    </div>
+                  </div>
+                  <div class="list card">
+                    <div class="item">                     
+                      <h1>Emily, 20</h1>                      
+                    </div>
+                    <div class="item item-image">
+                      <img src="http://cdn.eldiariony.com/wp-content/uploads/2015/05/emily-ratajkowski-twitter-instagram-personal-photos-january-2014-collection_1.jpg">
+                    </div>                   
+                    <div class="button-bar padding-top">
+                      <button class="icon ion-close-round button button-large button-clear button-balanced"></button>
+                      <button class="icon ion-ios-heart button button-large button-clear button-assertive"></button>
+                    </div>
+                  </div>
+                  </ion-card>
+                </ion-list>
+              </ion-content>
+            </ion-nav-view>
+          </ion-tab>
+
+          <ion-tab title="Matchs" icon="ion-ios-heart">
+           
+
+          </ion-tab>
+
+      </ion-tabs>      
+    </ion-pane>

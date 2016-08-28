@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="C:\IA\datev6\platforms\android\build\intermediates\exploded-aar\android.phonegap-facebook-plugin\datev6180240-FacebookLib\unspecified\debug\libs\bolts-android-1.1.2.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="91c20388c9a45f62b5ed8fe0502bb76ff6251fc7">
+        <dex dex="C:\IA\datev6\platforms\android\build\intermediates\pre-dexed\debug\bolts-android-1.1.2-159b658b34b4bc6f53aaeec0cdbf6cf985efc3fe.jar" />
+    </item>
+    <item
+        jar="C:\IA\datev6\platforms\android\build\intermediates\exploded-aar\android.phonegap-facebook-plugin\datev6180240-FacebookLib\unspecified\debug\libs\android-support-v4.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="efec67655f6db90757faa37201efcee2a9ec3507">
+        <dex dex="C:\IA\datev6\platforms\android\build\intermediates\pre-dexed\debug\android-support-v4-be531e8b38bbe9c06396a7d22642199bb15dcb7c.jar" />
+    </item>
+    <item
+        jar="C:\IA\datev6\platforms\android\build\intermediates\exploded-aar\android\CordovaLib\unspecified\debug\classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="f9da9152b547202e066f35ba0b4c6096eb4e70a6">
+        <dex dex="C:\IA\datev6\platforms\android\build\intermediates\pre-dexed\debug\classes-d6b683cd9ec796f988b742b9460173ff2b7ad153.jar" />
+    </item>
+    <item
+        jar="C:\IA\datev6\platforms\android\build\intermediates\exploded-aar\android.phonegap-facebook-plugin\datev6180240-FacebookLib\unspecified\debug\libs\bolts-android-1.1.2.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="91c20388c9a45f62b5ed8fe0502bb76ff6251fc7">
+        <dex dex="C:\IA\datev6\platforms\android\build\intermediates\pre-dexed\debug\bolts-android-1.1.2-159b658b34b4bc6f53aaeec0cdbf6cf985efc3fe.jar" />
+    </item>
+    <item
+        jar="C:\IA\datev6\platforms\android\build\intermediates\exploded-aar\android.phonegap-facebook-plugin\datev6180240-FacebookLib\unspecified\debug\classes.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="836d8ba259664b54b054b5ee5dee0556e2e6df76">
+        <dex dex="C:\IA\datev6\platforms\android\build\intermediates\pre-dexed\debug\classes-b34124c621ce14c7f3a95b999b507d934b8690b9.jar" />
+    </item>
+    <item
+        jar="C:\IA\datev6\platforms\android\build\intermediates\exploded-aar\android\CordovaLib\unspecified\debug\classes.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="f9da9152b547202e066f35ba0b4c6096eb4e70a6">
+        <dex dex="C:\IA\datev6\platforms\android\build\intermediates\pre-dexed\debug\classes-d6b683cd9ec796f988b742b9460173ff2b7ad153.jar" />
+    </item>
+    <item
+        jar="C:\IA\datev6\platforms\android\build\intermediates\exploded-aar\android.phonegap-facebook-plugin\datev6180240-FacebookLib\unspecified\debug\classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="ba466517f4797a76543c55ad8ffaebe3ae228228">
+        <dex dex="C:\IA\datev6\platforms\android\build\intermediates\pre-dexed\debug\classes-b34124c621ce14c7f3a95b999b507d934b8690b9.jar" />
+    </item>
+    <item
+        jar="C:\IA\datev6\platforms\android\build\intermediates\exploded-aar\android.phonegap-facebook-plugin\datev6180240-FacebookLib\unspecified\debug\libs\android-support-v4.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="efec67655f6db90757faa37201efcee2a9ec3507">
+        <dex dex="C:\IA\datev6\platforms\android\build\intermediates\pre-dexed\debug\android-support-v4-be531e8b38bbe9c06396a7d22642199bb15dcb7c.jar" />
+    </item>
+
+</items>

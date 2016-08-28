@@ -1,0 +1,22 @@
+<ion-modal-view ng-controller="cropImageController" ng-init="cropImage()" >  
+  <ion-header-bar>     
+      <button class="button button-clear button-top-left" ng-click="closeCropModal()">
+         <i class="icon icon-left ion-android-arrow-back"></i>
+      </button>    
+    <h1 class="title">Crop your Picture!</h1>    
+  </ion-header-bar>
+  <ion-content class="outWithHasTabsTop">           
+    <div class="cropArea">
+      <img-crop image="myImage" result-image="myCroppedImage" area-type="square" on-change="onChange($dataURI)"></img-crop>
+    </div>        
+    <div class="profileButtons">
+      <button class="button button-block button-royal" ng-click="callMatchProfile(sugestions[10])">
+          Cancel
+      </button>
+      <button class="button button-block button-positive" ng-click="saveCroppedImage()">
+          Save
+      </button>
+    </div>
+  </ion-content>
+</ion-modal-view>
+

@@ -1,0 +1,5 @@
+C:\IA\datev6\platforms\android\build\intermediates\classes\debug
+C:\IA\datev6\platforms\android\build\intermediates\pre-dexed\debug\bolts-android-1.1.2-159b658b34b4bc6f53aaeec0cdbf6cf985efc3fe.jar
+C:\IA\datev6\platforms\android\build\intermediates\pre-dexed\debug\classes-d6b683cd9ec796f988b742b9460173ff2b7ad153.jar
+C:\IA\datev6\platforms\android\build\intermediates\pre-dexed\debug\classes-b34124c621ce14c7f3a95b999b507d934b8690b9.jar
+C:\IA\datev6\platforms\android\build\intermediates\pre-dexed\debug\android-support-v4-be531e8b38bbe9c06396a7d22642199bb15dcb7c.jar

@@ -1,0 +1,26 @@
+<!--
+  View: login.html
+  Description: View responsável pela tela de entrada. Primera tela ao abrir a aplicação 
+  Author: Edian Comachio 
+ -->
+
+<ion-view view-title class="loginScreen">
+    <ion-content>
+      <div class="loginLogo">
+         	<p>Date.</p>      	
+      </div>
+       <label class="item" ng-controller="AppCtrl">
+          <button class="button button-block button-positive" ng-click="login()">
+          Login with Mobile Facebook
+          {{user.name}}
+          </button>         
+      </label> 
+      <!--
+      <label class="item" ng-controller="AppCtrl">
+          <button class="button button-block button-positive" ng-click="fbLogin()">
+          Login with Facebook
+          {{user.name}}
+          </button>         
+      </label>     -->
+    </ion-content>
+</ion-view>

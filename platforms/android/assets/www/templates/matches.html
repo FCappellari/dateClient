@@ -1,0 +1,27 @@
+<!--
+  View: matches.html
+  Description: View responsável por aprensetar o lista de combinações do usuário logado.
+  Author: Edian Comachio 
+ -->
+<ion-view view-title="Matches" ng-controller="MatchesCtrl" ng-init="getUserSugestion()">
+  
+  <ion-content class="outWithHasTabsTop">         
+    <div class="item-input-inset">
+      <label class="item-input-wrapper">
+        <i class="icon ion-ios-search placeholder-icon"></i>
+        <input type="search" placeholder="Search" ng-model="searchMatches">
+      </label>    
+    </div>
+    <ion-list>    
+      <ion-item class="item-remove-animate item-thumbnail-left  item item-avatar matches" href="#" ng-repeat="sugestion in sugestions | filter:searchMatches" ng-click="chat()">
+      	
+      <img src="{{sugestion.profilePic}}">
+	    <h2>{{sugestion.name}}</h2>
+    	<p>{{sugestion.interestsInCommon}}</p>            	
+    	
+      <ion-option-button class="button-energized" ng-click="getMatchDetails()"><i class="icon ion-pie-graph"></i></ion-option-button>   
+      </ion-item>      
+    </ion-list>    
+    </div>
+  </ion-content>
+</ion-view>

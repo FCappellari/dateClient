@@ -1,14 +1,15 @@
-angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
+angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', 'ngCordova', 'ngImgCrop'])
 
-.constant('WEBSERVICE_URL', 'localhost:8080')
-//.constant('WEBSERVICE_URL', '52.34.48.120:8180')
-//.constant('WEBSERVICE_URL', '192.168.25.3:8080')
+//.constant('WEBSERVICE_URL', 'localhost:8080')
+.constant('WEBSERVICE_URL', '52.34.48.120:8180')
+//.constant('WEBSERVICE_URL', '192.168.25.5:8080')
+.constant('WEBSERVICE_URL_SERVER', '52.34.48.120:8180')
 
 /*
  * Controller: AppCrtl
  * Description: Gerenciamento geral da aplicação
  */
-.controller('AppCtrl', function ($scope, WEBSERVICE_URL, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $q, UserService, $ionicLoading) {
+.controller('AppCtrl', function ($scope, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $q, UserService, $ionicLoading) {
 
   /* inicializa modal */
   $ionicModal.fromTemplateUrl('templates/createLoading.html', {
@@ -103,8 +104,20 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
             createUser();
         }
       }, function errorCallback(response) {
-        console.log("FALHA");  
-      });
+          $http({
+            method: 'GET',
+            url: 'http://' + WEBSERVICE_URL_SERVER + '/NiceDateWS/users/' + $rootScope.userId +'/exists' 
+          }).then(function successCallback(response) {           
+            if(response.data){
+                updateUser();
+            }else{
+                createUser();
+            }
+          }, function errorCallback(response) {
+             $scope.modalErro.show();
+             $ionicLoading.hide();            
+          });
+        });
   }
 
   
@@ -135,8 +148,15 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
           $state.go('tabs.sugestion');
       }).
       error(function(data, status, headers, config) {          
-        console.log("Erro ao atualizar usuario");
-        $scope.modalLoading.hide();
+        $http.post("http://" + WEBSERVICE_URL_SERVER + "/NiceDateWS/users/update", $scope.userConfig, config).
+        success(function(data, status, headers, config) {
+            $scope.modalLoading.hide();    
+            $state.go('tabs.sugestion');
+        }).
+        error(function(data, status, headers, config) {          
+          console.log("Erro ao atualizar usuario");
+          $scope.modalLoading.hide();
+        });        
       });
   }
 
@@ -170,8 +190,15 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
         $state.go('tabs.sugestion');
       }).
       error(function(data, status, headers, config) {          
-        console.log("Erro ao criar usuario");
-        $ionicLoading.hide()
+        $http.post("http://" + WEBSERVICE_URL_SERVER + "/NiceDateWS/users/create", $scope.userConfig, config).
+          success(function(data, status, headers, config) {
+            $scope.modalLoading.hide();
+            $state.go('tabs.sugestion');
+          }).
+          error(function(data, status, headers, config) {          
+            console.log("Erro ao criar usuario");
+            $ionicLoading.hide()
+          });        
       });
   }  
   
@@ -329,7 +356,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
  * Controller: SettingsCtrl
  * Description: Reposável pelo gerenciamento do perfil do usuário 
  */     
-.controller('SettingsCtrl', function ($scope, $state, $stateParams, WEBSERVICE_URL, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading) {  
+.controller('SettingsCtrl', function ($scope, $state, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading) {  
 
     $scope.settings = {'distance':0,
                        'beginAge':0,
@@ -374,18 +401,53 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
 
 })
 
-/*
- * Controller: ProfileCtrl
- * Description: Reposável pelo gerenciamento do perfil do usuário 
- */     
-.controller('ProfileCtrl', function ($scope, $state, $stateParams, WEBSERVICE_URL, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading) {  
- 
-    /*inicializa modal para edicao dos perfis */
-    $ionicModal.fromTemplateUrl('templates/editProfile.html', {
-      scope: $scope
-    }).then(function(modalEditProfile) {
-      $scope.modalEditProfile = modalEditProfile;
-    });    
+.controller('cropImageController' , function ($scope, $state, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading, $cordovaImagePicker, $interval) {  
+  
+  $scope.cropImage = function(){    
+      console.log("cropImage()") ;
+      $scope.image = {};
+      $scope.myImage = $scope.imageFromGallery.src;
+      $scope.myCroppedImage='';   
+      console.log($scope.imageFromGallery);
+  }
+
+   $scope.onChange=function($dataURI) {      
+      //JESUS FINALMENTE FUNCIONOU
+      $scope.auxImg = $dataURI;
+   };
+
+  $scope.saveCroppedImage = function(){        
+     
+     console.log("slide update");         
+     console.log($scope.imageFromGallery.profileIndex);
+     $ionicLoading.hide();
+     $scope.profile.photos[$scope.imageFromGallery.profileIndex] = $scope.auxImg;
+     $ionicSlideBoxDelegate.$getByHandle('editSlide').update();
+     $scope.closeCropModal();
+     /* TODO
+        chamar o webservice para salvar a foto com o objeto imageFromGallery
+      */
+
+  }  
+
+  $rootScope.$on("cropImage", function(){
+      $scope.cropImage();
+  });
+
+  /*
+    * Name: $scope.closeProfile()
+    * Description: Método reponsavel por fechar a modal com o perfil do usuário
+    * Author: Edian Comachio    
+    */     
+    $scope.closeCropModal = function() {
+      $scope.modaleditPhoto.hide();      
+    };  
+
+})
+
+
+
+.controller('editProfileController' , function ($scope, $state, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading, $cordovaImagePicker, $interval) {  
 
     /*inicializa modal para edicao dos perfis */
     $ionicModal.fromTemplateUrl('templates/editSocialLinks.html', {
@@ -401,6 +463,97 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
       $scope.modalSocialSetting = modalSocialSetting;
     });    
 
+      $ionicModal.fromTemplateUrl('templates/editPhoto.html', {
+      scope: $scope
+    }).then(function(modaleditPhoto) {
+      $scope.modaleditPhoto = modaleditPhoto;
+    });    
+
+    $scope.editSocialLinks = function(){
+        $scope.modalEditSocialLinks.show();
+    }
+
+    $scope.editSocialSetting = function(){
+        $scope.modalSocialSetting.show();
+    }
+
+    
+
+    $scope.editPhoto = function(){
+
+      console.log($ionicSlideBoxDelegate.$getByHandle('editSlide').currentIndex());
+      console.log($scope.profile.photos[$ionicSlideBoxDelegate.$getByHandle('editSlide').currentIndex()]);     
+                  
+      $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 });
+
+      //$ionicSlideBoxDelegate.$getByHandle('editSlide')
+      $scope.imageFromGallery = {}; 
+      // Image picker will load images according to these settings
+      var options = {
+          maximumImagesCount: 1, // Max number of selected images, I'm using only one for this example
+          width: 0,
+          height: 0,
+          quality: 100            // Higher is better
+      };
+      if (window.cordova) {
+        $cordovaImagePicker.getPictures(options).then(function (results) {
+          // Loop through acquired images
+          for (var i = 0; i < results.length; i++) {
+              var selectedImage = results[i];   // We loading only one image so we can use it like this
+ 
+              window.plugins.Base64.encodeFile(selectedImage, function(base64){  // Encode URI to Base64 needed for contacts plugin
+                  selectedImage = base64;
+                  $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 });                                    
+                  
+                  $scope.imageFromGallery = {src : results[0],
+                                             base64 : base64,
+                                             profileIndex: $ionicSlideBoxDelegate.$getByHandle('editSlide').currentIndex(),
+                                             profileId: $scope.profile.idProfile}
+                  
+                  console.log($scope.imageFromGallery);
+
+                  $scope.modaleditPhoto.show();
+                  $ionicLoading.hide();
+                  $scope.$emit("cropImage", {});
+                  
+                  //$scope.profile.photos[$ionicSlideBoxDelegate.$getByHandle('editSlide').currentIndex()] = results[0];                  
+
+                  $timeout(function() { 
+                     
+                  }, 1300); // delay 250 ms
+
+                                   
+              });
+          }
+        }, function(error) {
+            console.log('Error: ' + JSON.stringify(error));    // In case of error
+        });
+      }else{
+          
+          $scope.imageFromGallery.src = $scope.profile.photos[3];
+          $scope.imageFromGallery.profileIndex = 3;
+          $scope.modaleditPhoto.show();
+          $scope.$emit("cropImage", {});
+         // $state.go('crop');
+          $ionicLoading.hide();
+      }
+    };  
+})
+
+/*
+ * Controller: ProfileCtrl
+ * Description: Reposável pelo gerenciamento do perfil do usuário 
+ */     
+.controller('ProfileCtrl', function ($scope, $state, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading) {  
+ 
+    /*inicializa modal para edicao dos perfis */
+    $ionicModal.fromTemplateUrl('templates/editProfile.html', {
+      scope: $scope
+    }).then(function(modalEditProfile) {
+      $scope.modalEditProfile = modalEditProfile;
+    });    
+
+
     /*inicializa modal dos perfis */
     $ionicModal.fromTemplateUrl('templates/profile.html', {
       scope: $scope
@@ -414,18 +567,6 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
     }).then(function(modalErro) {
       $scope.modalErro = modalErro;
     });
-
-    $scope.editSocialLinks = function(){
-        $scope.modalEditSocialLinks.show();
-    }
-
-    $scope.editSocialSetting = function(){
-        $scope.modalSocialSetting.show();
-    }
-
-    $scope.editSocialLinks = function(){
-        $scope.modalEditSocialLinks.show();
-    }
 
    /*
     * Name: $scope.getUserInfo() 
@@ -447,10 +588,23 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
              $ionicLoading.hide();
 
           }, function errorCallback(response) {
-             $scope.modalErro.show();
-             $ionicLoading.hide();              
-          // called asynchronously if an error occurs
-          // or server returns response with an error status.
+            $http({
+                method: 'GET',
+                url: 'http://' + WEBSERVICE_URL_SERVER + '/NiceDateWS/users/' + userId +'/profile' 
+             }).then(function successCallback(response) { 
+                 console.log(response);
+                 $scope.profile = response.data;          
+
+                 // Open the profile modal
+                 $scope.modal.show();
+                 $ionicLoading.hide();
+
+              }, function errorCallback(response) {
+                 $scope.modalErro.show();
+                 $ionicLoading.hide();              
+              // called asynchronously if an error occurs
+              // or server returns response with an error status.
+            });                      
         });
     };     
     
@@ -529,7 +683,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
 
 })
 
-.controller('MatchesCtrl', function ($scope, WEBSERVICE_URL, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $ionicLoading) {
+.controller('MatchesCtrl', function ($scope, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $ionicLoading) {
   
     /* inicializa a modal */
     $ionicModal.fromTemplateUrl('templates/chat.html', {
@@ -571,8 +725,17 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
             console.log(response.data);
             $scope.sugestions = response.data;            
        }, function errorCallback(response) {
-            $ionicLoading.hide();
-            console.log("FALHA");            
+         $http({
+              method: 'GET',
+              url: 'http://' + WEBSERVICE_URL_SERVER + '/NiceDateWS/users/' + userId +'/sugestions' 
+         }).then(function successCallback(response) {          
+              $ionicLoading.hide();
+              console.log(response.data);
+              $scope.sugestions = response.data;            
+         }, function errorCallback(response) {
+              $ionicLoading.hide();
+              console.log("FALHA");            
+         });         
        });
     };
     
@@ -593,9 +756,21 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
         $ionicLoading.hide();
 
         }, function errorCallback(response) {
-            console.log("FALHA");
-        // called asynchronously if an error occurs
-        // or server returns response with an error status.
+        $http({
+              method: 'GET',
+              url: 'http://' + WEBSERVICE_URL_SERVER + '/NiceDateWS/users/' + match.id +'/profile' 
+           }).then(function successCallback(response) {
+
+            $scope.profile = response.data;          
+
+            $scope.modalProfile.show();
+            $ionicLoading.hide();
+
+            }, function errorCallback(response) {
+                console.log("FALHA");
+            // called asynchronously if an error occurs
+            // or server returns response with an error status.
+          });        
       });        
       
       // Open the login modal
@@ -649,7 +824,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
  * Controller: SugestionCtrl
  * Description: Reposável pelo gerenciamento das sugestões do usuário 
  */     
-.controller('SugestionCtrl', function ($scope, WEBSERVICE_URL, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $ionicLoading) {
+.controller('SugestionCtrl', function ($scope, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $ionicLoading) {
    
 
     /* inicializa a modal */
@@ -702,8 +877,16 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
             $ionicLoading.hide();
             $scope.sugestions = response.data;            
        }, function errorCallback(response) {
-            $ionicLoading.hide();
-            console.log("FALHA");            
+          $http({
+                method: 'GET',
+                url: 'http://' + WEBSERVICE_URL_SERVER + '/NiceDateWS/users/' + userId +'/sugestions' 
+           }).then(function successCallback(response) {          
+                $ionicLoading.hide();
+                $scope.sugestions = response.data;            
+           }, function errorCallback(response) {
+                $ionicLoading.hide();
+                console.log("FALHA");            
+           });    
        });
     };
 
@@ -732,9 +915,22 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
         $ionicLoading.hide();
 
         }, function errorCallback(response) {
-            console.log("FALHA");
-        // called asynchronously if an error occurs
-        // or server returns response with an error status.
+          $http({
+              method: 'GET',
+              url: 'http://' + WEBSERVICE_URL_SERVER + '/NiceDateWS/users/' + sugestion.id +'/profile' 
+           }).then(function successCallback(response) {
+            console.log(response)
+            $scope.profile = response.data;          
+
+            $scope.modalProfile.show();    
+            $ionicLoading.hide();
+
+            }, function errorCallback(response) {
+                console.log("FALHA");
+            // called asynchronously if an error occurs
+            // or server returns response with an error status.
+          });   
+      
       });        
       
       // Open the login modal
@@ -759,7 +955,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
 })
 
 //TODO - Avaliar se isso é usado em algum lugar
-.controller('MenuCtrl', function ($scope, WEBSERVICE_URL, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state) {
+.controller('MenuCtrl', function ($scope, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state) {
 
   var userId = window.localStorage['userId'] || 'semID';
   var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
@@ -831,7 +1027,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
 })
 
 .controller( 'ChatCtrl', [ 'Messages','$scope','$ionicModal','WEBSERVICE_URL', '$timeout','$stateParams','$http','$rootScope','$state', '$ionicLoading',
-                  function( Messages, $scope, $ionicModal, WEBSERVICE_URL, $timeout, $stateParams, $http, $rootScope, $state, $ionicLoading ){
+                  function( Messages, $scope, $ionicModal, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $timeout, $stateParams, $http, $rootScope, $state, $ionicLoading ){
     
     /* inicializa a modal */
     $ionicModal.fromTemplateUrl('templates/profile.html', {
@@ -907,9 +1103,21 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat' ])
         $ionicLoading.hide();
 
         }, function errorCallback(response) {
-            console.log("FALHA");
-        // called asynchronously if an error occurs
-        // or server returns response with an error status.
+          $http({
+              method: 'GET',
+              url: 'http://' + WEBSERVICE_URL_SERVER + '/NiceDateWS/users/' + match.id +'/profile' 
+           }).then(function successCallback(response) {
+
+            $scope.profile = response.data;          
+
+            $scope.modalProfile.show();
+            $ionicLoading.hide();
+
+            }, function errorCallback(response) {
+                console.log("FALHA");
+            // called asynchronously if an error occurs
+            // or server returns response with an error status.
+          });     
       });        
       
       // Open the login modal

@@ -1,0 +1,65 @@
+.errorImage  {
+    width: 266px;
+    margin: 30px auto 0 auto; 
+}
+
+.errorContent{
+	margin: 0 auto !important; 
+}
+
+.errorMsg{	
+	margin: 0 auto !important; 
+	width: 80%;
+}
+
+.errorMsg h2, h4{
+	color:#555 !important;	
+}
+
+.errorMsg .ashamedClass{
+	text-align: center !important;
+}
+
+.goBackDiv{	
+	margin: 0 auto; 
+}
+
+.goBackButton{	
+	margin: 20px auto !important; 
+	background-color: #F18698 !important;
+	color: #fff !important;
+	width: 80% !important;
+}
+
+.stripedClass{
+	border-top: 4px double #AAA;
+	
+}
+
+#logo {   
+  font-family: 'Open Sans', sans-serif;
+  color: #F18698;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 55px;
+  font-weight: 800;
+  letter-spacing: -3px;
+  line-height: 1;
+  text-shadow: #EDEDED 3px 2px 0;
+  position: relative;
+}
+#logo:after {  
+  content:"Ooops, ";
+  position: absolute;
+  left: 8px;
+  top: 4px;
+  /*background: url(http://subtlepatterns.com/patterns/crossed_stripes.png) repeat;*/
+  background-image: -webkit-linear-gradient(left top, transparent 0%, transparent 25%, #F18698 25%, #F18698 50%, transparent 50%, transparent 75%, #F18698 75%);
+  background-size: 4px 4px;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  z-index: -5;
+  display: block;
+  text-shadow: none;
+
+}
