@@ -5,6 +5,19 @@
 // the 2nd parameter is an array of 'requires'
 angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-native-transitions', 'chart.js'])
 
+
+.factory('configService', function() {
+  var config = {
+    headers:  {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'        
+    }
+  }  
+  return config;
+})
+
+
+
 .run(function ($ionicPlatform, ngFB) {  
   ngFB.init({appId: '973158726110069'});
 

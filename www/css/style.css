@@ -756,3 +756,9 @@ img-crop {
       margin: 0!important;
    }
 }
+
+.footer {
+   position:absolute;
+   bottom:50px;
+   width:100%;
+}

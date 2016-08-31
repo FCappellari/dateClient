@@ -1,9 +1,11 @@
 angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', 'ngCordova', 'ngImgCrop'])
 
-//.constant('WEBSERVICE_URL', 'localhost:8080')
-.constant('WEBSERVICE_URL', '52.34.48.120:8180')
+.constant('WEBSERVICE_URL', 'localhost:8080')
+//.constant('WEBSERVICE_URL', '52.34.48.120:8180')
 //.constant('WEBSERVICE_URL', '192.168.25.5:8080')
 .constant('WEBSERVICE_URL_SERVER', '52.34.48.120:8180')
+
+
 
 /*
  * Controller: AppCrtl
@@ -356,12 +358,27 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
  * Controller: SettingsCtrl
  * Description: Reposável pelo gerenciamento do perfil do usuário 
  */     
-.controller('SettingsCtrl', function ($scope, $state, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading) {  
+.controller('SettingsCtrl', function ($scope, $state, configService, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading) {  
 
-    $scope.settings = {'distance':0,
+    $scope.settings = {'choice' : 'Both',
+                       'distance':0,
                        'beginAge':0,
                        'finalAge':100
-                      };
+                     };
+
+    //objeto usuario
+    $scope.userConfig = {
+      accessToken: window.localStorage['accessToken'],
+      id: $rootScope.userId,
+      settings:  $scope.settings
+    }
+
+    console.log($scope.userConfig);
+
+    var config = configService;
+    
+    // REQUISICAO WEBSERVICE
+
 
     /*inicializa modal dos perfis */
     $ionicModal.fromTemplateUrl('templates/settings.html', {
@@ -394,23 +411,80 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     * TODO - tratamento de erro do webservice
     */ 
     $scope.getUserSettings = function(){       
+
+       $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 });
+
        // Open the profile modal
+       $http({
+            method: 'GET',
+            url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + $rootScope.userId +'/settings' 
+         }).then(function successCallback(response) { 
+             console.log($scope.settings);
+             $scope.settings = response.data;          
+
+             // Open the profile modal
+             $scope.modal.show();
+             $ionicLoading.hide();
+
+          }, function errorCallback(response) {
+            $http({
+                method: 'GET',
+                url: 'http://' + WEBSERVICE_URL_SERVER + '/NiceDateWS/users/' + $rootScope.userId +'/settings' 
+             }).then(function successCallback(response) { 
+                 console.log($scope.settings);
+                 $scope.settings = response.data;          
+
+                 // Open the profile modal
+                 $scope.modal.show();
+                 $ionicLoading.hide();
+
+              }, function errorCallback(response) {
+                 $scope.modalErro.show();
+                 $ionicLoading.hide();              
+              // called asynchronously if an error occurs
+              // or server returns response with an error status.
+            });                      
+        });
+
        $scope.modal.show();
        $ionicLoading.hide();
      };
 
      $scope.save = function(){
-       /* TODO chamar webservice para salvar as confugurações */
-       swal("Alright!", "Everything saved!", "success");
-       $scope.modal.hide();
-     }
+        
+        $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 });
 
+        $scope.userConfig.settings = $scope.settings;
+ 
+        $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/updateUserSettings", $scope.userConfig, config).
+          success(function(data, status, headers, config) {
+              $ionicLoading.hide();    
+              console.log("aqui");
+              swal("Alright!", "Everything saved!", "success");
+              $scope.modal.hide();
+              
+          }).error(function(data, status, headers, config) {          
+        
+              $http.post("http://" + WEBSERVICE_URL_SERVER + "/NiceDateWS/users/updateUserSettings", $scope.userConfig, config).
+              success(function(data, status, headers, config) {
+                  $scope.modalLoading.hide();    
+                  console.log("aqui2");
+                  swal("Alright!", "Everything saved!", "success");
+                  $scope.modal.hide();
+              }).
+              error(function(data, status, headers, config) {                          
+                $ionicLoading.hide();    
+              });        
+
+          });          
+     }
+  
      $scope.closeSettings = function(){
         $scope.modal.hide();
      }
 })
 
-.controller('cropImageController' , function ($scope, $state, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading, $cordovaImagePicker, $interval) {  
+.controller('cropImageController' , function ($scope, $state, configService, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading, $cordovaImagePicker, $interval) {  
   
   $scope.cropImage = function(){    
       console.log("cropImage()") ;
@@ -427,18 +501,41 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 
   $scope.saveCroppedImage = function(){        
      
-     console.log("slide update");         
-     console.log($scope.imageFromGallery.profileIndex);
-     $ionicLoading.hide();
-     $scope.profile.photos[$scope.imageFromGallery.profileIndex] = $scope.auxImg;
-     $ionicSlideBoxDelegate.$getByHandle('editSlide').update();
-     swal("Alright!", "Everything saved!", "success");
-     $scope.closeCropModal();
-     
+    console.log("slide update");         
+    console.log($scope.imageFromGallery.profileIndex);
+    $ionicLoading.show();
 
-     /* TODO
-        chamar o webservice para salvar a foto com o objeto imageFromGallery
-      */
+    var config = configService;
+
+    $scope.userConfig = {
+      userId: window.localStorage['userId'] || 'semID',
+      index:$scope.imageFromGallery.profileIndex,
+      imageBase64: $scope.auxImg
+    }
+
+    $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/updatePhoto", $scope.userConfig, config).
+       success(function(data, status, headers, config) {
+
+          $scope.profile.photos[$scope.imageFromGallery.profileIndex] = $scope.auxImg;
+          $ionicSlideBoxDelegate.$getByHandle('editSlide').update();
+         
+          $ionicLoading.hide();
+          swal("Alright!", "Everything saved!", "success");
+          $scope.closeCropModal();
+
+          swal("Alright!", "Everything saved!", "success"); 
+        }).
+        error(function(data, status, headers, config) {          
+          $http.post("http://" + WEBSERVICE_URL_SERVER + "/NiceDateWS/users/createSocialLink", $scope.userConfig, config).
+          success(function(data, status, headers, config) {
+              $ionicLoading.hide();
+              $scope.modalAddSocialLink.hide();      
+              swal("Alright!", "Everything saved!", "success");            
+          }).
+          error(function(data, status, headers, config) {          
+            
+          });        
+    });    
 
   }  
 
@@ -459,7 +556,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 
 
 
-.controller('editProfileController' , function ($scope, $state, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading, $cordovaImagePicker, $interval) {  
+.controller('editProfileController' , function ($scope, configService, $state, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading, $cordovaImagePicker, $interval) {  
 
     /*inicializa modal para edicao dos perfis */
     $ionicModal.fromTemplateUrl('templates/editSocialLinks.html', {
@@ -479,10 +576,73 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       scope: $scope
     }).then(function(modaleditPhoto) {
       $scope.modaleditPhoto = modaleditPhoto;
-    });    
+    });   
+
+    $ionicModal.fromTemplateUrl('templates/addSocialLinks.html', {
+      scope: $scope
+    }).then(function(modalAddSocialLinks) {
+      $scope.modalAddSocialLinks = modalAddSocialLinks;
+    });   
+
+    $scope.closeAddSocialLinks = function(){    
+      $scope.modalAddSocialLinks.hide();
+    }   
+
+   $ionicModal.fromTemplateUrl('templates/addSocialLink.html', {
+      scope: $scope
+    }).then(function(modalAddSocialLink) {
+      $scope.modalAddSocialLink = modalAddSocialLink;
+    });   
+
+    $scope.closeAddSocialLink = function(){    
+      $scope.modalAddSocialLink.hide();
+    } 
+
+    $scope.addSocialLink2 = function(index){
+      $scope.modalAddSocialLink.show();      
+      $scope.socialLink = index;
+    }
+
+    $scope.addSocialLink = function(){
+        $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 });
+
+        var userId = window.localStorage['userId'] || 'semID';
+
+        $http({
+            method: 'GET',
+            url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/socialLink/getSocialLinks' 
+         }).then(function successCallback(response) { 
+            console.log("addSocialLinks");
+             console.log(response);
+             $scope.socialLinks = response.data.socialLinks;          
+             
+             $ionicLoading.hide();
+
+          }, function errorCallback(response) { 
+
+          })
+         $scope.modalAddSocialLinks.show();
+    }
 
     $scope.editSocialLinks = function(){
-        $scope.modalEditSocialLinks.show();
+        $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 });
+
+        var userId = window.localStorage['userId'] || 'semID';
+
+        $http({
+            method: 'GET',
+            url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId + '/getSocialLinks' 
+         }).then(function successCallback(response) { 
+             console.log(response);
+             $scope.socialLinks = response.data.socialLink;          
+             
+             $ionicLoading.hide();
+
+          }, function errorCallback(response) {
+
+          })
+         $scope.modalEditSocialLinks.show();
+
     }
 
     $scope.editSocialSetting = function(){
@@ -503,9 +663,37 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     };  
 
     $scope.saveSocialLink = function(){
-      /* TODO chamar webservice para salvar a link social */
-      $scope.modalSocialSetting.hide();      
-      swal("Alright!", "Everything saved!", "success");
+      console.log("auieqweqweqw");
+      $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 });
+
+      var config = configService;     
+
+      $scope.userConfig = {
+          userId: window.localStorage['userId'],
+          accessToken: window.localStorage['accessToken'],
+          socialLink: $scope.socialLink
+      }
+     
+      console.log($scope.userConfig);
+
+      $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/createSocialLink", $scope.userConfig, config).
+      success(function(data, status, headers, config) {
+        $ionicLoading.hide();
+        $scope.modalAddSocialLink.hide();      
+        swal("Alright!", "Everything saved!", "success"); 
+      }).
+      error(function(data, status, headers, config) {          
+        $http.post("http://" + WEBSERVICE_URL_SERVER + "/NiceDateWS/users/createSocialLink", $scope.userConfig, config).
+        success(function(data, status, headers, config) {
+            $ionicLoading.hide();
+            $scope.modalAddSocialLink.hide();      
+            swal("Alright!", "Everything saved!", "success");            
+        }).
+        error(function(data, status, headers, config) {          
+          
+        });        
+      });
+      
     }
 
     $scope.editPhoto = function(){
@@ -611,7 +799,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
          }).then(function successCallback(response) { 
              console.log(response);
              $scope.profile = response.data;          
-
+             //console.log($scope.profile.socialLinks[0]);
              // Open the profile modal
              $scope.modal.show();
              $ionicLoading.hide();
