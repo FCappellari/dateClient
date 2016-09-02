@@ -3,7 +3,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 .constant('WEBSERVICE_URL', 'localhost:8080')
 //.constant('WEBSERVICE_URL', '52.34.48.120:8180')
 //.constant('WEBSERVICE_URL', '192.168.25.5:8080')
-.constant('WEBSERVICE_URL_SERVER', '52.34.48.120:8180')
+.constant('WEBSERVICE_URL_SERVER', 'localhost:8080')
 
 
 
@@ -624,6 +624,39 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
          $scope.modalAddSocialLinks.show();
     }
 
+    $scope.saveEditProfile = function(){
+        $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 });
+        
+        console.log("passou no save");
+
+        var config = configService;     
+
+        $scope.userConfig = {
+            userId: window.localStorage['userId'],
+            accessToken: window.localStorage['accessToken'],
+            profile : $scope.profile
+        }
+
+        $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/updateUserBio", $scope.userConfig, config).
+        success(function(data, status, headers, config) {
+            $ionicLoading.hide();
+            $scope.modalEditProfile.hide();
+            swal("Alright!", "Everything saved!", "success"); 
+        }).
+        error(function(data, status, headers, config) {          
+          $http.post("http://" + WEBSERVICE_URL_SERVER + "/NiceDateWS/users/updateUserBio", $scope.userConfig, config).
+          success(function(data, status, headers, config) {
+             $ionicLoading.hide();         
+             $scope.modalEditProfile.hide(); 
+             swal("Alright!", "Everything saved!", "success"); 
+          }).
+          error(function(data, status, headers, config) {          
+           console.log("Erro ao atualizar usuario");
+           $scope.modalLoading.hide();
+          });        
+        });
+    }
+
     $scope.editSocialLinks = function(){
         $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 });
 
@@ -769,7 +802,6 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     }).then(function(modalEditProfile) {
       $scope.modalEditProfile = modalEditProfile;
     });    
-
 
     /*inicializa modal dos perfis */
     $ionicModal.fromTemplateUrl('templates/profile.html', {
