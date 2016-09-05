@@ -3,7 +3,7 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-native-transitions', 'chart.js'])
+angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-native-transitions', 'chart.js', 'uiGmapgoogle-maps'])
 
 
 .factory('configService', function() {
@@ -44,7 +44,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-na
     }
 })
 
-.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider, uiGmapGoogleMapApiProvider) {
 
   //import 'ionic-native-transitions';
   //require('ionic-native-transitions');
@@ -60,10 +60,10 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-na
       },
     })  
 
-    .state('crop', {
-      url: '/crop',      
-      templateUrl: 'templates/editPhoto.html',
-      controller: 'cropImageController'            
+    .state('settings', {
+      url: '/settings',      
+      templateUrl: 'templates/settings.html',
+      controller: 'SettingsCtrl'            
     })  
 
     .state('tabs', {
@@ -112,8 +112,16 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-na
   $ionicConfigProvider.tabs.position("top");
 
   $urlRouterProvider.otherwise('/login');
+  
+  uiGmapGoogleMapApiProvider.configure({
+        key:'AIzaSyCIFJ6KIe5mHThIWh8yljbQszXqLlJ_lSs',
+        v: '3',
+        libraries: '',
+        language: 'en',
+        sensor: 'false',
+    });
+})    
 
-})
 .controller('LoginCtrl', function($scope, $state) {
   
   $scope.signIn = function(user) {

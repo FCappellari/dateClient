@@ -143,15 +143,14 @@ body{
 }
 
 .loginScreen{
-   /* background: url("../img/afternoon.jpg") no-repeat;    */
-    background: url("../img/noon.jpg") no-repeat;    
-   /* background: url("../img/night.jpg") no-repeat;    */
-   /* background: url("../img/night1.jpg") no-repeat;   */
-    /* background: url("../img/night2.jpg") no-repeat;   */
-    /* background: url("../img/night3.jpg") no-repeat; */   
-    /* background: url("../img/night4.jpg") no-repeat;   */
-    
-   /* background: url("../img/afternoon2.jpg") no-repeat;   */
+    /* background: url("../img/afternoon.jpg") no-repeat;  */
+    /* background: url("../img/noon.jpg") no-repeat;       */
+    /* background: url("../img/night.jpg") no-repeat;      */
+    /* background: url("../img/night1.jpg") no-repeat;     */
+    /* background: url("../img/night2.jpg") no-repeat;     */
+    /* background: url("../img/night3.jpg") no-repeat;     */    
+     background: url("../img/night4.jpg") no-repeat;     
+    /* background: url("../img/afternoon2.jpg") no-repeat; */
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -762,3 +761,8 @@ img-crop {
    bottom:50px;
    width:100%;
 }
+
+.angular-google-map-container { height: 400px; }
+
+
+

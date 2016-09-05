@@ -117,7 +117,14 @@
         },
         "com-badrit-base64": {
             "PACKAGE_NAME": "com.ionicframework.datev6180240"
+        },
+        "cordova-plugin-geolocation": {
+            "PACKAGE_NAME": "com.ionicframework.datev6180240"
         }
     },
-    "dependent_plugins": {}
+    "dependent_plugins": {
+        "cordova-plugin-compat": {
+            "PACKAGE_NAME": "com.ionicframework.datev6180240"
+        }
+    }
 }

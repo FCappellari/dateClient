@@ -11,12 +11,13 @@
     <h1 class="title">Settings</h1>    
   </ion-header-bar>
   <ion-content class=" outWithHasTabsTop"> 
+
     <div class="settingsContent">
     <h4>Are you interested in:</h4>                  
     <ion-list>
-      <ion-radio ng-model="choice" ng-value="'MALE'">Men</ion-radio>
-      <ion-radio ng-model="choice" ng-value="'FEMALE'">Womem</ion-radio>
-      <ion-radio ng-model="choice" ng-value="'BOTH'">Both</ion-radio>
+      <ion-radio ng-model="choice" ng-value="MALE">Men</ion-radio>
+      <ion-radio ng-model="choice" ng-value="FEMALE">Womem</ion-radio>
+      <ion-radio ng-model="choice" ng-value="BOTH">Both</ion-radio>
     </ion-list>        
     <h4>Begin Age</h4>    
     <div class="item range">
@@ -35,11 +36,23 @@
     <h4>Distance</h4>
     <div class="item range">
       <i class="icon ion-arrow-down-a"></i>
-      <input type="range" name="volume" ng-model="settings.distance">
+      <input type="range" name="volume" max="200" min="20" ng-model="settings.distance">
       <i class="icon ion-arrow-up-a"></i>
-      <h4>{{settings.distance}} Km</h4>
-    </div>
+      <h4>{{settings.distance}} Km</h4>    
+    </div>    
+      <ui-gmap-google-map center="map.center" zoom="map.zoom" control="map.control" options="map.options" ng-if="map.center">
+        <ui-gmap-circle center="map.circle.center"
+                        radius="map.circle.radius"
+                        fill="map.circle.fill"
+                        stroke="map.circle.stroke"
+                        clickable="map.circle.clickable"
+                        draggable="map.circle.draggable"
+                        editable="map.circle.editable"
+                        visible="map.circle.visible"
+                        events="map.circle.events">
+        </ui-gmap-circle>
+    </ui-gmap-google-map>
+   </div>   
     <button class="button button-block button-positive" ng-click="save()">Save</button>
-   </div>
   </ion-content>                      
 </ion-modal-view>

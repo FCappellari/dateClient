@@ -1,9 +1,10 @@
-angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', 'ngCordova', 'ngImgCrop'])
+angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', 'ngCordova', 'ngImgCrop','uiGmapgoogle-maps'])
 
-.constant('WEBSERVICE_URL', 'localhost:8080')
+.constant('WEBSERVICE_URL', '52.34.48.120:8180')
 //.constant('WEBSERVICE_URL', '52.34.48.120:8180')
 //.constant('WEBSERVICE_URL', '192.168.25.5:8080')
-.constant('WEBSERVICE_URL_SERVER', 'localhost:8080')
+//.constant('WEBSERVICE_URL', '192.168.0.103:8080')
+.constant('WEBSERVICE_URL_SERVER', '52.34.48.120:8180')
 
 
 
@@ -11,7 +12,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
  * Controller: AppCrtl
  * Description: Gerenciamento geral da aplicação
  */
-.controller('AppCtrl', function ($scope, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $q, UserService, $ionicLoading) {
+.controller('AppCtrl', function ($scope, $cordovaGeolocation, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $q, UserService, $ionicLoading) {
 
   /* inicializa modal */
   $ionicModal.fromTemplateUrl('templates/createLoading.html', {
@@ -25,7 +26,17 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
    * Description: Método reponsavel por direcionar o login conforme a plataforma WEB ou Dispositivo movel
    * Author: Edian Comachio
    */
-  $scope.login = function(){
+  $scope.login = function(){    
+
+    var posOptions = {timeout: 10000, enableHighAccuracy: false};
+    $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {        
+        window.localStorage['geoLocalizationLat'] = position.coords.latitude;
+        window.localStorage['geoLocalizationLong'] = position.coords.longitude;
+        console.log(window.localStorage['geoLocalizationLong']);
+    }, function(err) {
+        console.log("ERRO AO PEGAR LOCALIZACAO");
+    });
+
     if (window.cordova) {
       console.log("DEVICE");
       $scope.facebookSignIn();
@@ -141,7 +152,11 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       //objeto usuario
       $scope.userConfig = {
         accessToken: window.localStorage['accessToken'],
-        id: $rootScope.userId
+        id: $rootScope.userId,
+        location: {
+          latitude: window.localStorage['geoLocalizationLat'],
+          longitude: window.localStorage['geoLocalizationLong']
+        }
       }
 
       $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/update", $scope.userConfig, config).
@@ -181,7 +196,11 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       //objeto usuario
       $scope.userConfig = {
         accessToken: window.localStorage['accessToken'],
-        id: $rootScope.userId
+        id: $rootScope.userId,
+        location: {
+          latitude: window.localStorage['geoLocalizationLat'],
+          longitude: window.localStorage['geoLocalizationLong']
+        }
       }
 
       console.log($scope.userConfig);
@@ -363,21 +382,21 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     $scope.settings = {'choice' : 'Both',
                        'distance':0,
                        'beginAge':0,
-                       'finalAge':100
-                     };
+                       'finalAge':100,
+                       'latitude':0,
+                       'longitude':0
+                     }; 
 
     //objeto usuario
     $scope.userConfig = {
       accessToken: window.localStorage['accessToken'],
-      id: $rootScope.userId,
+      id: window.localStorage['userId'],
       settings:  $scope.settings
     }
 
     console.log($scope.userConfig);
 
-    var config = configService;
-    
-    // REQUISICAO WEBSERVICE
+    var config = configService;    
 
 
     /*inicializa modal dos perfis */
@@ -411,21 +430,25 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     * TODO - tratamento de erro do webservice
     */ 
     $scope.getUserSettings = function(){       
-
+       console.log(window.localStorage['userId']);
        $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 });
-
+       
        // Open the profile modal
        $http({
             method: 'GET',
-            url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + $rootScope.userId +'/settings' 
+            url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + window.localStorage['userId'] +'/settings' 
          }).then(function successCallback(response) { 
-             console.log($scope.settings);
-             $scope.settings = response.data;          
+             console.log(response);
+             $scope.settings = response.data;                   
+             
+            console.log($scope.settings.choice);
 
-             // Open the profile modal
-             $scope.modal.show();
+             //$state.go('settings');
              $ionicLoading.hide();
 
+             buildMap();             
+             $scope.modal.show();            
+             
           }, function errorCallback(response) {
             $http({
                 method: 'GET',
@@ -435,7 +458,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
                  $scope.settings = response.data;          
 
                  // Open the profile modal
-                 $scope.modal.show();
+                 //$scope.modal.show();
                  $ionicLoading.hide();
 
               }, function errorCallback(response) {
@@ -446,13 +469,16 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
             });                      
         });
 
-       $scope.modal.show();
-       $ionicLoading.hide();
+       //$scope.modal.show();
+       //$ionicLoading.hide();
      };
 
      $scope.save = function(){
         
         $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 });
+
+        $scope.settings.latitude = window.localStorage['geoLocalizationLat'];
+        $scope.settings.longitude = window.localStorage['geoLocalizationLong'];
 
         $scope.userConfig.settings = $scope.settings;
  
@@ -481,6 +507,67 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
   
      $scope.closeSettings = function(){
         $scope.modal.hide();
+     }
+
+     $scope.$watch("settings.distance", function(newValue, oldValue){                
+        $scope.map.circle.radius = newValue * 1000;
+     });
+
+     buildMap = function(){
+       var latitude = window.localStorage['geoLocalizationLat'];
+       var longitude = window.localStorage['geoLocalizationLong'];
+
+       var latLng = new google.maps.LatLng(latitude, longitude);      
+
+       var center = latLng;
+
+        $scope.map = {
+          center: center,
+          pan: true,
+          zoom: 7,
+          refresh: false,
+          events: {},
+          bounds: {},          
+          options: {
+            navigationControl: false,
+            mapTypeControl: false,
+            scaleControl: false,
+            draggable: false,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            disableDefaultUI: true
+          }
+        };
+
+        console.log($scope.settings.distance);
+
+        $scope.map.circle = {
+          id: 1,
+          center: center,
+          radius: $scope.settings.distance * 1000,
+          stroke: {
+            color: '#08B21F',
+            weight: 2,
+            opacity: 1
+          },
+          fill: {
+            color: '#08B21F',
+            opacity: 0.4
+          },
+          geodesic: false, // optional: defaults to false
+          draggable: false, // optional: defaults to false
+          clickable: false, // optional: defaults to true
+          editable: false, // optional: defaults to false
+          visible: true, // optional: defaults to true
+          events:{
+            dblclick: function(){
+              window.alert("circle dblclick");
+            },
+            radius_changed: function(){
+                //window.alert("circle radius radius_changed");
+                console.log("circle radius radius_changed");
+            }
+          }
+        }      
      }
 })
 
@@ -622,39 +709,6 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 
           })
          $scope.modalAddSocialLinks.show();
-    }
-
-    $scope.saveEditProfile = function(){
-        $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 });
-        
-        console.log("passou no save");
-
-        var config = configService;     
-
-        $scope.userConfig = {
-            userId: window.localStorage['userId'],
-            accessToken: window.localStorage['accessToken'],
-            profile : $scope.profile
-        }
-
-        $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/updateUserBio", $scope.userConfig, config).
-        success(function(data, status, headers, config) {
-            $ionicLoading.hide();
-            $scope.modalEditProfile.hide();
-            swal("Alright!", "Everything saved!", "success"); 
-        }).
-        error(function(data, status, headers, config) {          
-          $http.post("http://" + WEBSERVICE_URL_SERVER + "/NiceDateWS/users/updateUserBio", $scope.userConfig, config).
-          success(function(data, status, headers, config) {
-             $ionicLoading.hide();         
-             $scope.modalEditProfile.hide(); 
-             swal("Alright!", "Everything saved!", "success"); 
-          }).
-          error(function(data, status, headers, config) {          
-           console.log("Erro ao atualizar usuario");
-           $scope.modalLoading.hide();
-          });        
-        });
     }
 
     $scope.editSocialLinks = function(){
@@ -803,6 +857,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       $scope.modalEditProfile = modalEditProfile;
     });    
 
+
     /*inicializa modal dos perfis */
     $ionicModal.fromTemplateUrl('templates/profile.html', {
       scope: $scope
@@ -830,7 +885,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
             url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/profile' 
          }).then(function successCallback(response) { 
              console.log(response);
-             $scope.profile = response.data;          
+             $scope.profile = response.data;  
              //console.log($scope.profile.socialLinks[0]);
              // Open the profile modal
              $scope.modal.show();
@@ -919,7 +974,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     $scope.closeError = function() {
       console.log("errorclose");
       $scope.modalErro.hide();      
-    };  
+    };      
 
 })
 
@@ -1150,6 +1205,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
        }).then(function successCallback(response) {
         console.log(response)
         $scope.profile = response.data;          
+        
+        var distanceKm = getDistanceFromLatLonInKm($scope.profile.latitude, $scope.profile.longitude, window.localStorage['geoLocalizationLat'], window.localStorage['geoLocalizationLong']);
+        $scope.profile.distance = parseInt(distanceKm, 10);        
 
         $scope.modalProfile.show();    
         $ionicLoading.hide();
@@ -1185,6 +1243,24 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     $scope.closeProfile = function() {
       $scope.modalProfile.hide();      
     }; 
+
+    function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+      var R = 6371; // Radius of the earth in km
+      var dLat = deg2rad(lat2-lat1);  // deg2rad below
+      var dLon = deg2rad(lon2-lon1); 
+      var a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2)
+        ; 
+      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+      var d = R * c; // Distance in km
+      return d;
+    }
+
+    function deg2rad(deg) {
+      return deg * (Math.PI/180)
+    }
 })
 
 //TODO - tirar do AppCtrl os metodos de login e passar pra cá
