@@ -18,7 +18,7 @@
       <li class="item item-toggle">
           Everyone:
           <label class="toggle toggle-positive">
-          <input type="checkbox" ng-model="socialLink.everyone" ng-click="changeVisibilityEveryone()">
+          <input type="checkbox" ng-model="socialLink.everyone">
           <div class="track">
             <div class="handle"></div>
           </div>
@@ -27,7 +27,7 @@
       <li class="item item-toggle">
         Only to matches:
           <label class="toggle toggle-positive">
-          <input type="checkbox" ng-model="socialLink.onlytomatches" ng-click="changeVisibilityOnlytomatches()">
+          <input type="checkbox" ng-model="socialLink.onlytomatches">
           <div class="track">
             <div class="handle"></div>
           </div>

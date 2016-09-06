@@ -1,6 +1,6 @@
 <ion-modal-view>  
-    <ion-header-bar>     
-      <button class="button button-clear button-top-left" ng-click="closeAddSocialLink()">
+  <ion-header-bar>     
+      <button class="button button-clear button-top-left" ng-click="closeSocialSetting()">
          <i class="icon icon-left ion-android-arrow-back"></i>
       </button>    
     <h1 class="title">{{socialLink.name}}</h1>    
@@ -18,7 +18,7 @@
       <li class="item item-toggle">
           Everyone:
           <label class="toggle toggle-positive">
-          <input type="checkbox" ng-model="socialLink.everyone" ng-click="changeVisibilityEveryone()">
+          <input type="checkbox" ng-model="socialLink.everyone">
           <div class="track">
             <div class="handle"></div>
           </div>
@@ -27,27 +27,25 @@
       <li class="item item-toggle">
         Only to matches:
           <label class="toggle toggle-positive">
-          <input type="checkbox" ng-model="socialLink.onlytomatches" ng-click="changeVisibilityOnlytomatches()">
+          <input type="checkbox" ng-model="socialLink.onlytomatches">
           <div class="track">
             <div class="handle"></div>
           </div>
         </label>
-      </li>          
-       <li class="item">
-       Content:        
-          <label class="item item-input">
-            <input type="text" placeholder="@{{profile.name}}" ng-model="socialLink.content">
-          </label>      
-      </li>              
+      </li>            
     </ion-list>      
-      <div class="profileButtons">        
+      <div class="profileButtons">
+        <button class="button button-block button-assertive" ng-click="deleteSocialLink({{socialLink}})">
+            Delete Social link
+        </button>
         <button class="button button-block button-royal" ng-click="closeSocialSetting()">
             Cancel
         </button>
-        <button class="button button-block button-positive" ng-click="saveSocialLink()">
+        <button class="button button-block button-positive" ng-click="saveEditSocialLink({{socialLink}})">
             Save
         </button>
       </div>
     </div>
   </ion-content>
 </ion-modal-view>
+

@@ -781,17 +781,19 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     $scope.editSocialSetting = function(index){
       $scope.socialLink = index;
 
-      if ($scope.socialLink.visibility == "ONLYMATCHES"){
-        console.log("aqui 1");
+      console.log($scope.socialLink);
+
+      if ($scope.socialLink.visibility = "ONLYMATCHES"){
         $scope.socialLink.onlytomatches = true;
         $scope.socialLink.everyone = false;
       } 
 
-      if ($scope.socialLink.visibility == "EVERYONE"){
-        console.log("aqui 2");
+      if ($scope.socialLink.visibility = "EVERYONE"){
         $scope.socialLink.onlytomatches = false;
         $scope.socialLink.everyone = true;
-      }     
+      }
+
+      console.log($scope.socialLink);
 
       $scope.modalSocialSetting.show();
     }
@@ -884,16 +886,6 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
           
           });        
         });
-      }
-
-      $scope.changeVisibilityEveryone = function(){
-        if ($scope.socialLink.everyone)
-          $scope.socialLink.onlytomatches =  false;
-      }
-
-      $scope.changeVisibilityOnlytomatches = function(){                
-        if ($scope.socialLink.onlytomatches)
-          $scope.socialLink.everyone = false;
       }
 
       $scope.saveEditSocialLink = function(){

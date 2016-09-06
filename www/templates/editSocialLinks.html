@@ -7,7 +7,7 @@
   </ion-header-bar>
   <ion-content class="outWithHasTabsTop">       
     <ion-list ng-repeat="socialLink in socialLinks">      
-      <a class="item item-icon-left item-icon-right" ng-click="editSocialSetting()">
+      <a class="item item-icon-left item-icon-right" ng-click="editSocialSetting({{socialLink}})">
         <i class="icon ion-social-{{socialLink.name}}"></i>
         {{socialLink.name}}
         <i class="icon ion-ios-arrow-right"></i>
