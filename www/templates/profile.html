@@ -35,8 +35,10 @@
         </span>      
       </ion-item>
       <ion-item class="item item-text-wrap profileName">
-          {{profile.bio}}
-         </p>
+         {{profile.bio}}
+      </ion-item>
+      <ion-item class="item item-text-wrap profileName">
+         <p ng-repeat="ic in profile.interestsInConnom"> {{ic.name}}, </p> 
       </ion-item>
       <ion-item class="item item-text-wrap profileName" ng-repeat="sc in profile.socialLinks">                     
             <button ng-href="{{sc.link}}" class="button button-large button-clear button-positive ion-social-{{sc.name}}"></button>            

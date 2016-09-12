@@ -713,7 +713,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 
         $http({
             method: 'GET',
-            url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/socialLink/'+ userId + '/getSocialLinks' 
+            url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/socialLink/' + userId + '/getSocialLinks' 
          }).then(function successCallback(response) { 
             console.log("addSocialLinks");
              $scope.socialLinks = response.data.socialLinks;          
@@ -1168,6 +1168,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
             url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/sugestions' 
        }).then(function successCallback(response) {          
             $ionicLoading.hide();
+            console.log("SUGESTOES");
             console.log(response.data);
             $scope.sugestions = response.data;            
        }, function errorCallback(response) {
@@ -1348,11 +1349,11 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 }); 
       console.log("callSugestionProfile");     
       console.log(sugestion);     
-
+      var userId = window.localStorage['userId'] || 'semID';
       var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
       $http({
           method: 'GET',
-          url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + sugestion.id +'/profile' 
+          url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/profile?sugestion=' + sugestion.id + '&user=' + userId
        }).then(function successCallback(response) {
         console.log(response)
         $scope.profile = response.data;          
@@ -1381,8 +1382,6 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
           });   
       
       });        
-      
-      // Open the login modal
      
     };
 
