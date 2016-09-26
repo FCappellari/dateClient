@@ -18,7 +18,7 @@
     </div>-->
     <div class="percentageContainer">          
       <div id="percentage">
-        <p>87%</p>
+        <p>{{match.percentage}}%</p>
       </div>      
     </div>    
     <h1 class="detailTitle A7CCED">Charts</h1>
@@ -28,29 +28,25 @@
       </canvas> 
     </div>
     <div class="card chart">
-      <canvas id="line" class="chart chart-line" chart-data="line.data"
-              chart-labels="line.labels" chart-series="line.series" chart-options="line.options"
-              chart-dataset-override="datasetOverride" chart-click="onClick"
+      <canvas id="bar" class="chart chart-bar" chart-data="bar.data"
+              chart-labels="bar.labels" chart-series="bar.series" chart-options="bar.options"              
       </canvas> 
     </div>
     <div class="bestInterest">
-      <p class="detailTitle 00A5CF">Interests Ranking<p>
-      <h1>SPORTS</h1>
-      <h2>MUSIC</h2>
-      <h3>BOOKS</h3>
-      <h4>PLACES</h4>
-      <h5>MOVIES</h5>
+      <p class="detailTitle 00A5CF">Interests Ranking<p>      
+      <div ng-repeat="interest in match.interestsInCommon | limitTo : 5">
+      <span class="h{{$index + 1}}">{{interest.name}}</span>      
     </div>
     <div class="profile">
       <div id="profile-info">
-          <img id="profile-image" src="{{sugestions[10].profilePic}}">
+          <img id="profile-image" src="{{match.profilePic}}">
       </div>
-      <h1 class="profileTitle A7CCED">{{sugestions[10].name}}</h1>
+      <h1 class="profileTitle A7CCED">{{match.name}}</h1>
       <div class="profileButtons">
         <button class="button button-block button-positive" ng-click="chat()">
             Send a message!
         </button>
-        <button class="button button-block button-royal" ng-click="callMatchProfile(sugestions[10])">
+        <button class="button button-block button-royal" ng-click="callMatchProfile(match)">
             Go to the profile!
         </button>
         <button class="button button-block button-assertive">

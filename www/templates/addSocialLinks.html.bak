@@ -1,0 +1,17 @@
+<ion-modal-view>  
+  <ion-header-bar>     
+      <button class="button button-clear button-top-left" ng-click="closeEditSocialLinks()">
+         <i class="icon icon-left ion-android-arrow-back"></i>
+      </button>    
+    <h1 class="title">Pick your Social Link</h1>    
+  </ion-header-bar>
+  <ion-content class="outWithHasTabsTop">         
+    <ion-list ng-repeat="socialLink in socialLinks">                
+       <a class="item item-icon-left item-icon-right" ng-click="addSocialLink2({{socialLink}})">
+        <i class="icon ion-social-{{socialLink.name}}"></i>
+        {{socialLink.name}}
+        <i class="icon ion-ios-arrow-right"></i>
+      </a>      
+    </ion-list>     
+  </ion-content>
+</ion-modal-view>

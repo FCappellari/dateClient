@@ -5,20 +5,30 @@
  -->
 <ion-view view-title="Sugestões">
   <ion-content class=" outWithHasTabsTop sugestionBG">                
-    <ion-list>                  
-      <div class="list card" ng-repeat="sugestion in sugestions" ng-model="sugestion" >
-        <div class="item">                     
-          <h1>{{sugestion.name}}</h1>
-        </div>
-        <div class="item item-image">
-          <img ng-src="{{sugestion.photos}}" class="suggestionImg" ng-click="callSugestionProfile(sugestion)">
-        </div>                   
-        <div class="button-bar padding-top">
-          <button class="icon ion-close-round button button-large button-clear button-balanced"></button>
-          <button class="icon ion-ios-heart button button-large button-clear button-assertive"></button>
+    <ion-list>      
+      <div class="list card sugestionCard" ng-repeat="sugestion in sugestions" ng-model="sugestion">                        
+       <!-- <div class="overlay" 
+             style="background:url({{sugestion.profilePic}});
+                    background-size:cover;
+                    background-repeat:no-repeat;
+                    "></div> -->
+        <div class="info">    
+           <div class="sugestionName">
+              <p>{{sugestion.name}}, 20</p>
+          </div>     
+          <div class="item item-image sugestionImage">
+            <img ng-src="{{sugestion.profilePic}}" class="suggestionImg" ng-click="callSugestionProfile(sugestion)">
+          </div>                   
+          
+          <div class="button-bar padding-top sugestionButtons">            
+            <button class="icon ion-close-round button button-large button-clear button-balanced" ng-click="dislike(sugestion)"></button>
+            <button class="icon ion-heart button button-large button-clear button-assertive" ng-click="like(sugestion)"></button>
+          </div>
+          <div class="top line"></div>
+          <div class="bot line"></div>
         </div>
       </div>      
-      </ion-card>
+      </div>
     </ion-list>
 
   </ion-content>

@@ -1,6 +1,6 @@
 /* Empty. Add your own CSS if you like */
-body{
-  font-family: Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif;
+*{
+  font-family: Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif !important;
 }
 
 .slider-pager-page
@@ -146,10 +146,15 @@ body{
     /* background: url("../img/afternoon.jpg") no-repeat;  */
     /* background: url("../img/noon.jpg") no-repeat;       */
     /* background: url("../img/night.jpg") no-repeat;      */
+    /* background: url("../img/sunset1.jpg") no-repeat;    */
+    /*  background: url("../img/sunset2.jpg") no-repeat;   */ 
+    /*  background: url("../img/sunset3.jpg") no-repeat;     */  
+      background: url("../img/sunset4.jpg") no-repeat;     
+    /*  background: url("../img/night3.jpg") no-repeat;      */  
     /* background: url("../img/night1.jpg") no-repeat;     */
     /* background: url("../img/night2.jpg") no-repeat;     */
-    /* background: url("../img/night3.jpg") no-repeat;     */    
-     background: url("../img/night4.jpg") no-repeat;     
+    /* background: url("../img/night3.jpg") no-repeat;     */
+    /* background: url("../img/night4.jpg") no-repeat;     */
     /* background: url("../img/afternoon2.jpg") no-repeat; */
   -webkit-background-size: cover;
   -moz-background-size: cover;
@@ -263,11 +268,11 @@ background-color: #293241;
   padding: 20px;
 }
 
-.bestInterest h1, h2{
+.bestInterest .h1, .h2{
   color:#011638;
 }
 
-.bestInterest h1{
+.bestInterest .h1{
   font-family: 'Open Sans', sans-serif;
   color: #293241;
   text-decoration: none;
@@ -279,7 +284,7 @@ background-color: #293241;
   position: relative;  
 }
 
-.bestInterest h2{
+.bestInterest .h2{
   font-family: 'Open Sans', sans-serif;
   color: #293241;
   text-decoration: none;
@@ -291,7 +296,7 @@ background-color: #293241;
   position: relative;  
 }
 
-.bestInterest h3{
+.bestInterest .h3{
   font-family: 'Open Sans', sans-serif;
   color: #293241;
   text-decoration: none;
@@ -303,7 +308,7 @@ background-color: #293241;
   position: relative;  
 }
 
-.bestInterest h4{
+.bestInterest .h4{
   font-family: 'Open Sans', sans-serif;
   color: #293241 !important;
   text-decoration: none;
@@ -315,7 +320,7 @@ background-color: #293241;
   position: relative;  
 }
 
-.bestInterest h5{
+.bestInterest .h5{
   font-family: 'Open Sans', sans-serif;
   color: #293241;
   text-decoration: none;
@@ -351,6 +356,18 @@ background-color: #293241;
   letter-spacing: -1px;
   line-height: 1;      
   padding: 5px;
+}
+
+.profileTitle, h1{
+  font-family: 'Open Sans', sans-serif;
+  color: #293241;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 1em;
+  font-weight: 800;
+  letter-spacing: -3px;
+  line-height: 1;  
+  position: relative;  
 }
 
 #profile-image {
@@ -761,6 +778,62 @@ img-crop {
    bottom:50px;
    width:100%;
 }
+
+
+
+.sugestionCard:before {  
+}
+
+.sugestionCard .overlay{
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  bottom:0;
+  z-index:1; 
+  overflow: hidden;
+}
+
+.sugestionCard .info{  
+  
+}
+
+.sugestionCard .info .button-large .icon:before, .button-large.icon:before, .button-large.icon-left:before, .button-large.icon-right:before{
+  font-size: 70px;
+  line-height: 60px;  
+}
+
+.sugestionCard{  
+  font-family:  !important;
+  background-color:unset; 
+  border-radius:5px;  
+  box-shadow: unset !important;
+}
+
+.sugestionName p{
+  font-size:3.5em;    
+}
+
+.sugestionName{
+  margin:20px 0;
+  z-index: 5;    
+  color:#eee;   
+}
+
+.sugestionImage{  
+  
+}
+
+.line{background:#999; width: 70%; margin:0 auto;}
+.top{border-bottom:#000 solid 1px; margin-top:1.5em; }
+.bot{border-top:#fff solid 1px;}
+
+.sugestionButtons{    
+  z-index: 5;       
+  box-shadow:unset !important;
+}
+
+.best
 
 .angular-google-map-container { height: 400px; }
 

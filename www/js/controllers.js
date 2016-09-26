@@ -3,7 +3,8 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 .constant('WEBSERVICE_URL', 'localhost:8080')
 //.constant('WEBSERVICE_URL', '52.34.48.120:8180')
 //.constant('WEBSERVICE_URL', '192.168.25.5:8080')
-.constant('WEBSERVICE_URL_SERVER', 'localhost:8080')
+//.constant('WEBSERVICE_URL', '192.168.0.103:8080')
+.constant('WEBSERVICE_URL_SERVER', '52.34.48.120:8180')
 
 
 
@@ -723,7 +724,6 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
           }, function errorCallback(response) { 
 
           })
-
          $scope.modalAddSocialLinks.show();
     }
 
@@ -776,6 +776,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 
           })
          $scope.modalEditSocialLinks.show();
+
     }
 
     $scope.editSocialSetting = function(index){
@@ -1129,7 +1130,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 
 })
 
-.controller('MatchesCtrl', function ($scope, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $ionicLoading) {
+.controller('MatchesCtrl', function ($scope, configService, orderByFilter, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $ionicLoading) {
   
     /* inicializa a modal */
     $ionicModal.fromTemplateUrl('templates/chat.html', {
@@ -1151,39 +1152,33 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       $scope.modalProfile = modalProfile;
     });
 
-    $scope.getUserSugestion = function(){
-
+    $scope.getUserMatches = function(){
+      
       $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 }); 
 
-      /* sugestion object 
-       * id = id facebook
-       * name = Nome          
-       * interestsInCommon = Interesses em comum com o usuário logado
-       * photos = foto da sugestão         
-       */        
       var userId = window.localStorage['userId'] || 'semID';
       var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
       $http({
             method: 'GET',
-            url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/sugestions' 
+            url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/matches?user=' + userId + '&accessToken=' + accessToken 
        }).then(function successCallback(response) {          
             $ionicLoading.hide();
-            console.log("SUGESTOES");
+            console.log("MATCHES");
             console.log(response.data);
-            $scope.sugestions = response.data;            
+            $scope.matches = response.data.matches;            
        }, function errorCallback(response) {
-         $http({
-              method: 'GET',
-              url: 'http://' + WEBSERVICE_URL_SERVER + '/NiceDateWS/users/' + userId +'/sugestions' 
-         }).then(function successCallback(response) {          
-              $ionicLoading.hide();
-              console.log(response.data);
-              $scope.sugestions = response.data;            
-         }, function errorCallback(response) {
-              $ionicLoading.hide();
-              console.log("FALHA");            
-         });         
+          $http({
+                method: 'GET',
+                url: 'http://' + WEBSERVICE_URL_SERVER + '/NiceDateWS/users/' + userId +'/sugestions' 
+           }).then(function successCallback(response) {          
+                $ionicLoading.hide();
+                $scope.sugestions = response.data;            
+           }, function errorCallback(response) {
+                $ionicLoading.hide();
+                console.log("FALHA");            
+           });    
        });
+      
     };
     
     $scope.callMatchProfile = function(match){                       
@@ -1224,9 +1219,20 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
      
     };
 
-    $scope.getMatchDetails = function(){       
-       $scope.modalMatchDetail.show();               
-       $scope.buildGraph();
+    $scope.getMatchDetails = function(match){              
+      $scope.modalMatchDetail.show();     
+
+      console.log(match);       
+      $scope.match = match;
+      var interests = match.interestsInCommon;      
+
+      interests.sort(function(a, b) {
+          return parseFloat(a.relevance) - parseFloat(b.relevance);
+      });
+
+      interests.reverse();      
+
+      $scope.buildGraph(interests);
     };
 
     $scope.chat = function(){         
@@ -1241,25 +1247,42 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       $scope.modalProfile.hide();      
     }; 
 
-    $scope.buildGraph = function(){  
-      //doughnut
+    $scope.buildGraph = function(interests){  
+      //doughnut      
+      console.log($scope.match.interestsInCommon);
+
       $scope.doughnut = {};                  
       $scope.doughnut.visible = true;            
-      $scope.doughnut.data = [[80, 75, 95, 27, 97]];
-      $scope.doughnut.labels = ["music", "Places", "Books", "Movies", "Sports"];    
+      $scope.doughnut.data = [[interests[0].relevance, 
+                               interests[1].relevance, 
+                               interests[2].relevance, 
+                               interests[3].relevance, 
+                               interests[4].relevance]];
+      $scope.doughnut.labels = [interests[0].name, 
+                                interests[1].name, 
+                                interests[2].name, 
+                                interests[3].name, 
+                                interests[4].name];    
       $scope.doughnut.series = ['Series']
       //$scope.doughnut.colours;
       $scope.doughnut.legend = true;
 
       //line
-      $scope.line = {};                  
-      $scope.line.labels = ["music", "Places", "Books", "Movies", "Sports"];
-      $scope.line.series = ['Series A'];
-      $scope.line.data = [
-        [80, 75, 95, 27, 97]        
+      $scope.bar = {};                  
+      $scope.bar.labels = [interests[0].name, 
+                           interests[1].name, 
+                           interests[2].name, 
+                           interests[3].name, 
+                           interests[4].name];      
+      $scope.bar.data = [
+        [interests[0].relevance, 
+         interests[1].relevance, 
+         interests[2].relevance, 
+         interests[3].relevance, 
+         interests[4].relevance]
       ];
       
-      $scope.line.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];      
+      //$scope.bar.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];      
       
     };
 
@@ -1271,7 +1294,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
  * Controller: SugestionCtrl
  * Description: Reposável pelo gerenciamento das sugestões do usuário 
  */     
-.controller('SugestionCtrl', function ($scope, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $ionicLoading) {
+.controller('SugestionCtrl', function ($scope, configService, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $ionicLoading) {
    
 
     /* inicializa a modal */
@@ -1280,7 +1303,61 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     }).then(function(modalProfile) {
       $scope.modalProfile = modalProfile;
     });
+   
+   /*
+    * Name: $scope.like()
+    * Description: Método reponsavel por dar like na sugestão 
+    * Author: Edian Comachio    
+    */         
+    $scope.like = function(sugestion){
+      
+      console.log("$scope.like = function(sugestion)");
 
+      console.log(sugestion);
+
+      if(sugestion.status == "LIKED"){
+         swal("DEU LIKE!", sugestion.status, "success");
+      }else if(sugestion.status == "DISLIKED"){
+         swal("SE FUDEU!", sugestion.status, "success");
+      }else{
+         swal("VAMOS AGUARDAR", sugestion.status, "success");
+      } 
+
+      setLikeWs(sugestion);    
+    }
+
+   /*
+    * Name: $scope.like()
+    * Description: Método reponsavel por fazer a requisição ao webservice para persisteir o like na base
+    * Author: Edian Comachio    
+    */  
+    function setLikeWs(sugestion){
+
+        params = {
+          userId: window.localStorage['userId'] || 'semID',
+          sugestionId: sugestion.id,
+          status: sugestion.status, 
+          accessToken: window.localStorage['accessToken']
+        };
+
+        var config = configService;   
+    
+        $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/like", params, config).
+        success(function(data, status, headers, config) {
+            $scope.modalLoading.hide();              
+        }).
+        error(function(data, status, headers, config) {          
+          /*$http.post("http://" + WEBSERVICE_URL_SERVER + "/NiceDateWS/users/like", $scope.userConfig, config).
+          success(function(data, status, headers, config) {
+              $scope.modalLoading.hide();    
+              $state.go('tabs.sugestion');
+          }).
+          error(function(data, status, headers, config) {          
+            console.log("Erro ao atualizar usuario");
+            $scope.modalLoading.hide();
+          }); */
+    }); 
+    }
    /*
     * Name: $scope.closeProfile()
     * Description: Método reponsavel por fechar atualizar as sugestoes do usuario através do webservice
@@ -1290,7 +1367,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       
       var userId = window.localStorage['userId'] || 'semID';
 
-      $http.get('http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/sugestions' )
+      $http.get('http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/sugestions?accessToken=' + accessToken)
          .success(function(newItems) {
            $scope.sugestions = newItems;
          })
@@ -1306,7 +1383,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     * Author: Edian Comachio    
     */     
     $scope.getUserSugestion = function(){
-
+      console.log("getUserSugestion");
       $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 }); 
 
       /* sugestion object 
@@ -1319,9 +1396,11 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
       $http({
             method: 'GET',
-            url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/sugestions' 
+            url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/sugestions?id=' + userId + '&accessToken=' + accessToken 
        }).then(function successCallback(response) {          
             $ionicLoading.hide();
+            console.log("SUGESTOES");
+            console.log(response.data);
             $scope.sugestions = response.data;            
        }, function errorCallback(response) {
           $http({
@@ -1353,7 +1432,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
       $http({
           method: 'GET',
-          url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/profile?sugestion=' + sugestion.id + '&user=' + userId
+          url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/profile?sugestion=' + sugestion.id + '&user=' + userId + '&accessToken=' + accessToken 
        }).then(function successCallback(response) {
         console.log(response)
         $scope.profile = response.data;          

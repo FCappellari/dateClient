@@ -1,0 +1,37 @@
+<ion-modal-view ng-controller="editProfileController">  
+  <ion-content>   
+    <button class="button button-clear button-top-left" ng-click="closeEditProfile()">
+         <i class="icon icon-left ion-android-arrow-back"></i>
+     </button>
+     <button class="button button-clear button-top-right" ng-click="editPhoto($index)">
+         <i class="icon icon-left ion-edit"></i>
+    </button> 
+    <ion-slide-box on-slide-changed="slideHasChanged($index)" delegate-handle="editSlide" class="no-padding">
+      <ion-slide ng-repeat="photo in profile.photos" repeat-done="repeatDone()">                
+          <img ng-src="{{photo}}" height="400" width="400">                      
+      </ion-slide>      
+    </ion-slide-box>    
+    <ion-list>
+      <ion-item class="item item-text-wrap profileName">
+        <h2>{{profile.name}}</h2>
+        <span>            
+            <i class="icon icon-left ion-location profileDistance"> 22Km </i>           
+        </span>      
+      </ion-item>
+      <label class="item item-input item-floating-label">
+        <span class="input-label">A little about yourself</span>
+        <input type="text" placeholder="A little about yourself">
+      </label>            
+
+      <ion-item class="item item-text-wrap ">
+            <button class="button button-large  button-clear button-positive  ion-social-twitter-outline"></button>
+            <button class="button button-large  button-clear button-positive ion-social-facebook"></button>
+            <button class="button button-large button-clear button-positive  ion-social-snapchat-outline "></button>
+     
+      </ion-item>
+
+      <button class="button button-block button-positive" ng-click="editSocialLinks()">Edit Social links</button>           
+      
+    </ion-list>      
+  </ion-content>
+</ion-modal-view>
