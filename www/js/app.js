@@ -16,6 +16,39 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-na
   return config;
 })
 
+.service('ModalErrorService', function($ionicModal, $rootScope) {  
+  
+  var init = function(tpl, $scope) {
+
+    var promise;
+    $scope = $scope || $rootScope.$new();
+    
+    promise = $ionicModal.fromTemplateUrl(tpl, {
+      scope: $scope,
+      animation: 'slide-in-up'
+    }).then(function(modalError) {
+      $scope.modalError = modalError;
+      return modalError;
+    });
+
+    $scope.openModalError = function() {
+       $scope.modalError.show();
+     };
+     $scope.closeModalError = function() {
+       $scope.modalError.hide();
+     };
+     $scope.$on('$destroy', function() {
+       $scope.modalError.remove();
+     });
+    
+    return promise;
+  }
+  
+  return {
+    init: init
+  }
+  
+})
 
 
 .run(function ($ionicPlatform, ngFB) {  

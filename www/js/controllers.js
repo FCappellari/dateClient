@@ -1,10 +1,10 @@
-angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', 'ngCordova', 'ngImgCrop','uiGmapgoogle-maps'])
+angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', 'ngCordova', 'ngImgCrop','uiGmapgoogle-maps', 'ngAnimate'])
 
 .constant('WEBSERVICE_URL', 'localhost:8080')
 //.constant('WEBSERVICE_URL', '52.34.48.120:8180')
 //.constant('WEBSERVICE_URL', '192.168.25.5:8080')
 //.constant('WEBSERVICE_URL', '192.168.0.103:8080')
-.constant('WEBSERVICE_URL_SERVER', '52.34.48.120:8180')
+.constant('WEBSERVICE_URL_SERVER', 'localhost:8080')
 
 
 
@@ -13,6 +13,22 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
  * Description: Gerenciamento geral da aplicação
  */
 .controller('AppCtrl', function ($scope, $cordovaGeolocation, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $q, UserService, $ionicLoading) {
+
+    /* 
+     * Autor: Edian Comachio
+     * Trecho que trata Erros exibidos para o usuario 
+     */
+    /*inicializa modal de erro */
+    $ionicModal.fromTemplateUrl('templates/errorDefaultPage.html', {
+      scope: $scope
+    }).then(function(modalErro) {
+      $scope.modalErro = modalErro;
+    });
+
+    $scope.closeError = function() {
+      console.log("errorclose");
+      $scope.modalErro.hide();      
+    };
 
   /* inicializa modal */
   $ionicModal.fromTemplateUrl('templates/createLoading.html', {
@@ -111,6 +127,8 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
         method: 'GET',
         url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + $rootScope.userId +'/exists' 
       }).then(function successCallback(response) {           
+        console.log("exists result");
+        console.log(response.data);
         if(response.data){
             updateUser();
         }else{
@@ -127,8 +145,10 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
                 createUser();
             }
           }, function errorCallback(response) {
-             $scope.modalErro.show();
-             $ionicLoading.hide();            
+              console.log("checkIfUserExist");
+              $scope.modalErro.show();
+              $scope.modalLoading.hide();              
+              $ionicLoading.hide();                        
           });
         });
   }
@@ -171,8 +191,10 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
             $state.go('tabs.sugestion');
         }).
         error(function(data, status, headers, config) {          
-          console.log("Erro ao atualizar usuario");
-          $scope.modalLoading.hide();
+            console.log("updateUser");
+            $scope.modalErro.show();
+            modalLoading.hide();
+            $ionicLoading.hide();              
         });        
       });
   }
@@ -217,8 +239,10 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
             $state.go('tabs.sugestion');
           }).
           error(function(data, status, headers, config) {          
-            console.log("Erro ao criar usuario");
-            $ionicLoading.hide()
+              console.log("createUser");
+              $scope.modalErro.show();
+              modalLoading.hide();
+              $ionicLoading.hide();                        
           });        
       });
   }  
@@ -379,6 +403,22 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
  */     
 .controller('SettingsCtrl', function ($scope, $state, configService, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading) {  
 
+    /* 
+     * Autor: Edian Comachio
+     * Trecho que trata Erros exibidos para o usuario 
+     */
+    /*inicializa modal de erro */
+    $ionicModal.fromTemplateUrl('templates/errorDefaultPage.html', {
+      scope: $scope
+    }).then(function(modalErro) {
+      $scope.modalErro = modalErro;
+    });
+
+    $scope.closeError = function() {
+      console.log("errorclose");
+      $scope.modalErro.hide();      
+    };
+
     $scope.settings = {'choice' : 'Both',
                        'distance':0,
                        'beginAge':0,
@@ -406,13 +446,6 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       $scope.modal = modal;
     });  
 
-    /*inicializa modal de erro */
-    $ionicModal.fromTemplateUrl('templates/errorDefaultPage.html', {
-      scope: $scope
-    }).then(function(modalErro) {
-      $scope.modalErro = modalErro;
-    });
-
    /*
     * Name: $scope.getLoggedUserProfile()
     * Description: Método reponsavel por gerenciar os eventos da view e apresentar o loading.
@@ -423,6 +456,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       $scope.getUserInfo();     
     };  
     */     
+
    /*
     * Name: $scope.getUserSettings() 
     * Description: Método reponsavel por buscar as configurações do usuário no webservice.
@@ -462,10 +496,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
                  $ionicLoading.hide();
 
               }, function errorCallback(response) {
-                 $scope.modalErro.show();
-                 $ionicLoading.hide();              
-              // called asynchronously if an error occurs
-              // or server returns response with an error status.
+                  console.log("getUserSettings");
+                  $scope.modalErro.show();
+                  $ionicLoading.hide();                                    
             });                      
         });
 
@@ -499,7 +532,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
                   $scope.modal.hide();
               }).
               error(function(data, status, headers, config) {                          
-                $ionicLoading.hide();    
+                  console.log("save");
+                  $scope.modalErro.show();
+                  $ionicLoading.hide();                                      
               });        
 
           });          
@@ -573,6 +608,22 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 
 .controller('cropImageController' , function ($scope, $state, configService, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading, $cordovaImagePicker, $interval) {  
   
+    /* 
+     * Autor: Edian Comachio
+     * Trecho que trata Erros exibidos para o usuario 
+     */
+    /*inicializa modal de erro */
+    $ionicModal.fromTemplateUrl('templates/errorDefaultPage.html', {
+      scope: $scope
+    }).then(function(modalErro) {
+      $scope.modalErro = modalErro;
+    });
+
+    $scope.closeError = function() {
+      console.log("errorclose");
+      $scope.modalErro.hide();      
+    };
+
   $scope.cropImage = function(){    
       console.log("cropImage()") ;
       $scope.image = {};
@@ -620,7 +671,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
               swal("Alright!", "Everything saved!", "success");            
           }).
           error(function(data, status, headers, config) {          
-            
+                  console.log("saveCroppedImage");
+                  $scope.modalErro.show();
+                  $ionicLoading.hide();                                    
           });        
     });    
 
@@ -696,7 +749,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
              $ionicLoading.hide();
 
           }, function errorCallback(response) {
-
+                console.log("closeAddSocialLinks");
+                $scope.modalErro.show();
+                $ionicLoading.hide();                                    
         })
 
       $scope.modalAddSocialLinks.hide();
@@ -722,7 +777,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
              $ionicLoading.hide();
 
           }, function errorCallback(response) { 
-
+                console.log("addSocialLink");
+                $scope.modalErro.show();
+                $ionicLoading.hide();                                    
           })
          $scope.modalAddSocialLinks.show();
     }
@@ -752,8 +809,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
              swal("Alright!", "Everything saved!", "success"); 
           }).
           error(function(data, status, headers, config) {          
-           console.log("Erro ao atualizar usuario");
-           $scope.modalLoading.hide();
+                console.log("saveEditProfile");
+                $scope.modalErro.show();
+                $ionicLoading.hide();                                    
           });        
         });
     }
@@ -773,7 +831,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
              $ionicLoading.hide();
 
           }, function errorCallback(response) {
-
+                console.log("editSocialLinks");
+                $scope.modalErro.show();
+                $ionicLoading.hide();                                    
           })
          $scope.modalEditSocialLinks.show();
 
@@ -844,7 +904,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
             swal("Alright!", "Everything saved!", "success");            
         }).
         error(function(data, status, headers, config) {          
-          
+                console.log("saveSocialLink");
+                $scope.modalErro.show();
+                $ionicLoading.hide();                                    
         });        
       });
      }
@@ -882,7 +944,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
               swal("Alright!", "SocialLink deleted!", "success");            
           }).
           error(function(data, status, headers, config) {          
-          
+                console.log("deleteSocialLink");
+                $scope.modalErro.show();
+                $ionicLoading.hide();                                    
           });        
         });
       }
@@ -930,7 +994,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
               swal("Alright!", "Everything saved!", "success");            
           }).
           error(function(data, status, headers, config) {          
-          
+                console.log("editSocialLink");
+                $scope.modalErro.show();
+                $ionicLoading.hide();                                    
           });        
         });
       }
@@ -1002,26 +1068,27 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
  */     
 .controller('ProfileCtrl', function ($scope, $state, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading) {  
  
-    /*inicializa modal para edicao dos perfis */
-    $ionicModal.fromTemplateUrl('templates/editProfile.html', {
+    /* 
+     * Autor: Edian Comachio
+     * Trecho que trata Erros exibidos para o usuario 
+     */
+    /*inicializa modal de erro */
+    $ionicModal.fromTemplateUrl('templates/errorDefaultPage.html', {
       scope: $scope
-    }).then(function(modalEditProfile) {
-      $scope.modalEditProfile = modalEditProfile;
-    });    
+    }).then(function(modalErro) {
+      $scope.modalErro = modalErro;
+    });
 
+    $scope.closeError = function() {
+      console.log("errorclose");
+      $scope.modalErro.hide();      
+    };
 
     /*inicializa modal dos perfis */
     $ionicModal.fromTemplateUrl('templates/profile.html', {
       scope: $scope
     }).then(function(modal) {
       $scope.modal = modal;
-    });
-    
-    /*inicializa modal de erro */
-    $ionicModal.fromTemplateUrl('templates/errorDefaultPage.html', {
-      scope: $scope
-    }).then(function(modalErro) {
-      $scope.modalErro = modalErro;
     });
 
    /*
@@ -1056,10 +1123,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
                  $ionicLoading.hide();
 
               }, function errorCallback(response) {
-                 $scope.modalErro.show();
-                 $ionicLoading.hide();              
-              // called asynchronously if an error occurs
-              // or server returns response with an error status.
+                  console.log("getUserInfo");
+                  $scope.modalErro.show();
+                  $ionicLoading.hide();                                    
             });                      
         });
     };     
@@ -1118,20 +1184,26 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       $scope.modalEditProfile.hide();      
     };  
 
-   /*
-    * Name: $scope.closeError()
-    * Description: Método reponsavel por fechar a modal com o Erro
-    * Author: Edian Comachio    
-    */     
-    $scope.closeError = function() {
-      console.log("errorclose");
-      $scope.modalErro.hide();      
-    };      
-
 })
 
 .controller('MatchesCtrl', function ($scope, configService, orderByFilter, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $ionicLoading) {
   
+    /* 
+     * Autor: Edian Comachio
+     * Trecho que trata Erros exibidos para o usuario 
+     */
+    /*inicializa modal de erro */
+    $ionicModal.fromTemplateUrl('templates/errorDefaultPage.html', {
+      scope: $scope
+    }).then(function(modalErro) {
+      $scope.modalErro = modalErro;
+    });
+
+    $scope.closeError = function() {
+      console.log("errorclose");
+      $scope.modalErro.hide();      
+    };
+
     /* inicializa a modal */
     $ionicModal.fromTemplateUrl('templates/chat.html', {
       scope: $scope
@@ -1174,8 +1246,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
                 $ionicLoading.hide();
                 $scope.sugestions = response.data;            
            }, function errorCallback(response) {
-                $ionicLoading.hide();
-                console.log("FALHA");            
+                 console.log("getUserMatches");
+                 $scope.modalErro.show();
+                 $ionicLoading.hide();
            });    
        });
       
@@ -1209,9 +1282,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
             $ionicLoading.hide();
 
             }, function errorCallback(response) {
-                console.log("FALHA");
-            // called asynchronously if an error occurs
-            // or server returns response with an error status.
+                console.log("callMatchProfile");
+                $scope.modalErro.show();
+                $ionicLoading.hide();            
           });        
       });        
       
@@ -1287,15 +1360,30 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     };
 
     //Busca sugestões automaticamente ao abrir a tela de sugestões
-    //$scope.getUserSugestion();  
+    $scope.getUserSugestion();  
 })
 
 /*
  * Controller: SugestionCtrl
  * Description: Reposável pelo gerenciamento das sugestões do usuário 
  */     
-.controller('SugestionCtrl', function ($scope, configService, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $ionicLoading) {
-   
+.controller('SugestionCtrl', function ($scope, $interval, configService, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $ionicScrollDelegate, ngFB, $stateParams, $http, $rootScope, $state, $ionicLoading) {
+
+    /* 
+     * Autor: Edian Comachio
+     * Trecho que trata Erros exibidos para o usuario 
+     */
+    /*inicializa modal de erro */
+    $ionicModal.fromTemplateUrl('templates/errorDefaultPage.html', {
+      scope: $scope
+    }).then(function(modalErro) {
+      $scope.modalErro = modalErro;
+    });
+
+    $scope.closeError = function() {
+      console.log("errorclose");
+      $scope.modalErro.hide();      
+    };
 
     /* inicializa a modal */
     $ionicModal.fromTemplateUrl('templates/profile.html', {
@@ -1304,26 +1392,134 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       $scope.modalProfile = modalProfile;
     });
    
+    /* inicializa a modal settings Alert*/
+    $ionicModal.fromTemplateUrl('templates/settingsAlert.html', {
+      scope: $scope
+    }).then(function(modalSettingAlert) {
+      console.log("aiaiaia esse amor");
+      $scope.modalSettingAlert = modalSettingAlert;
+    });
+
    /*
     * Name: $scope.like()
     * Description: Método reponsavel por dar like na sugestão 
     * Author: Edian Comachio    
     */         
-    $scope.like = function(sugestion){
+    $scope.like = function(sugestion, index){
+      
       
       console.log("$scope.like = function(sugestion)");
-
+      $scope._index = index;
       console.log(sugestion);
 
-      if(sugestion.status == "LIKED"){
-         swal("DEU LIKE!", sugestion.status, "success");
+      if(sugestion.status == "LIKED"){        
+        matchAnimation(sugestion);
       }else if(sugestion.status == "DISLIKED"){
-         swal("SE FUDEU!", sugestion.status, "success");
+        
       }else{
-         swal("VAMOS AGUARDAR", sugestion.status, "success");
-      } 
+        startChange("like");
+        
+      }
 
-      setLikeWs(sugestion);    
+      //setLikeWs(sugestion);    
+    }
+
+    $scope.deleteCard = function deleteCard(index){ 
+      console.log("deleteCard");
+      $scope.sugestions.splice(index, 1);
+      if($scope.sugestions.length == 0){
+        $scope.getUserSugestion();
+      }
+    };  
+
+    // remove old keyframes and add new ones
+    function change(anim, op)
+        {
+            // find our -webkit-keyframe rule
+            var keyframes = findKeyframesRule(anim);
+            
+            console.log(keyframes);
+
+            // remove the existing 0% and 100% rules
+            keyframes.deleteRule("0%");
+            keyframes.deleteRule("20%");
+            keyframes.deleteRule("100%");
+            
+            if(op=="like"){
+              keyframes.appendRule("0% { -webkit-transform: translateX(0);}");
+              keyframes.appendRule("20% { -webkit-transform: translateX(-15px) rotate(-10deg) scale(1.1); }");
+              keyframes.appendRule("100% { -webkit-transform: translateX(400px) rotate(90deg) scale(1.7); }");
+            }else{
+              keyframes.appendRule("0% { -webkit-transform: translateX(0); }");
+              keyframes.appendRule("20% { -webkit-transform: translateX(15px) rotate(10deg) scale(1.1) }");
+              keyframes.appendRule("100% { -webkit-transform: translateX(-400px) rotate(-90deg) scale(0.5) }");
+            }
+            // assign the animation to our element (which will cause the animation to run)
+            angular.element(document.querySelector('animate')).css('animation', '0.5s my_animation');
+    }
+
+    function findKeyframesRule(rule)
+    {
+        var ss = document.styleSheets;
+
+        for (var i = 0; i < ss.length; ++i)
+        {
+            for (var j = 0; j < ss[i].cssRules.length; ++j)
+            {
+                if (ss[i].cssRules[j].type == window.CSSRule.WEBKIT_KEYFRAMES_RULE && ss[i].cssRules[j].cssText.indexOf(rule) !== -1)
+                    return ss[i].cssRules[j];
+            }
+        }
+        return null;
+    }
+
+    // begin the new animation process
+    function startChange(op)
+    {
+            // remove the old animation from our object
+            angular.element(document.querySelector('animate')).css('animation', '0.5s none');
+            
+            // call the change method, which will update the keyframe animation
+            setTimeout(function(){
+               change("my_animation", op);              
+            },0);
+    
+            var deleteCardAux = function () {
+                $interval.cancel(promise2);
+                $scope.deleteCard($scope._index);
+            }
+
+            promise2 = $interval(deleteCardAux, 100);      
+
+    }  
+
+    function matchAnimation(sugestion){
+
+      console.log("$scope.dislike = function(sugestion)");      
+
+      var topModal = $ionicScrollDelegate.$getByHandle('sugestionScrollHandle').getScrollPosition().top - 5;      
+      angular.element(document.querySelector('.overlay')).css({ top: topModal + 'px' });;
+      angular.element(document.querySelector('.overlay')).addClass('is-active');      
+      angular.element(document.querySelector('.match1')).css('background-image', 'url(' + sugestion.profilePic + ')');
+      angular.element(document.querySelector('.match2')).css('background-image', 'url(' + $scope.profile.photos[0] + ')');
+      
+      console.log($ionicScrollDelegate.$getByHandle('sugestionScrollHandle').getScrollView());            
+      angular.element(document.querySelector('.outWithHasTabsTop')).css('overflow-y', 'hidden');      
+      //deshabilita o scroll :)
+      $ionicScrollDelegate.$getByHandle('sugestionScrollHandle').getScrollView().options.freeze = true;
+
+      var pauseAnimation = function () {
+          $interval.cancel(promise);
+          angular.element(document.querySelector('.overlay')).addClass('pausedAnimation');
+          angular.element(document.querySelector('.modal')).addClass('pausedAnimation');
+          angular.element(document.querySelector('.matchImg')).addClass('pausedAnimation');
+          angular.element(document.querySelector('.match1')).addClass('pausedAnimation');
+          angular.element(document.querySelector('.match2')).addClass('pausedAnimation');
+          angular.element(document.querySelector('.matchButton1')).addClass('pausedAnimation');
+          angular.element(document.querySelector('.matchButton2')).addClass('pausedAnimation');          
+      }
+
+      promise = $interval(pauseAnimation, 700);      
     }
 
    /*
@@ -1347,17 +1543,53 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
             $scope.modalLoading.hide();              
         }).
         error(function(data, status, headers, config) {          
-          /*$http.post("http://" + WEBSERVICE_URL_SERVER + "/NiceDateWS/users/like", $scope.userConfig, config).
-          success(function(data, status, headers, config) {
-              $scope.modalLoading.hide();    
-              $state.go('tabs.sugestion');
-          }).
-          error(function(data, status, headers, config) {          
-            console.log("Erro ao atualizar usuario");
-            $scope.modalLoading.hide();
-          }); */
-    }); 
+              console.log("setLikeWs");
+              $scope.modalErro.show();
+              $ionicLoading.hide();              
+        }); 
     }
+    
+    /*
+    * Name: $scope.dislike()
+    * Description: Método reponsavel por dar dislike na sugestão 
+    * Author: Edian Comachio    
+    */         
+    $scope.dislike = function(sugestion, index){
+
+      var removeCard = function () {
+          
+           
+      }
+
+      startChange("dislike");     
+
+      promise = $interval(removeCard, 400);
+      
+    }
+
+    $scope.dismissMatchModal = function(sugestion, index){
+
+      angular.element(document.querySelector('.overlay')).removeClass('pausedAnimation');      
+      angular.element(document.querySelector('.modal')).removeClass('pausedAnimation');
+      angular.element(document.querySelector('.matchImg')).removeClass('pausedAnimation');
+      angular.element(document.querySelector('.match1')).removeClass('pausedAnimation');
+      angular.element(document.querySelector('.match2')).removeClass('pausedAnimation');
+      angular.element(document.querySelector('.matchButton1')).removeClass('pausedAnimation');
+      angular.element(document.querySelector('.matchButton2')).removeClass('pausedAnimation');          
+      
+      var removeClass = function () {
+          $interval.cancel(promise);
+          angular.element(document.querySelector('.overlay')).removeClass('is-active');      
+          //habilita o scroll denovo :)
+          angular.element(document.querySelector('.outWithHasTabsTop')).css('overflow-y', 'unset');      
+          console.log($scope._index);
+          
+      }     
+      startChange("like");
+      promise = $interval(removeClass, 400);      
+
+    }
+
    /*
     * Name: $scope.closeProfile()
     * Description: Método reponsavel por fechar atualizar as sugestoes do usuario através do webservice
@@ -1394,27 +1626,53 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
        */        
       var userId = window.localStorage['userId'] || 'semID';
       var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
+      
       $http({
-            method: 'GET',
-            url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/sugestions?id=' + userId + '&accessToken=' + accessToken 
-       }).then(function successCallback(response) {          
-            $ionicLoading.hide();
-            console.log("SUGESTOES");
-            console.log(response.data);
-            $scope.sugestions = response.data;            
-       }, function errorCallback(response) {
-          $http({
-                method: 'GET',
-                url: 'http://' + WEBSERVICE_URL_SERVER + '/NiceDateWS/users/' + userId +'/sugestions' 
-           }).then(function successCallback(response) {          
-                $ionicLoading.hide();
-                $scope.sugestions = response.data;            
-           }, function errorCallback(response) {
-                $ionicLoading.hide();
-                console.log("FALHA");            
-           });    
-       });
+              method: 'GET',
+              url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/hasSettings?id=' + userId + '&accessToken=' + accessToken  
+         }).then(function successCallback(response) {          
+              $ionicLoading.hide();              
+              console.log(response.data);                            
+              //usuario tem as preferencias configuradas
+              if(response.data){
+                  $http({
+                        method: 'GET',
+                        url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/sugestions?id=' + userId + '&accessToken=' + accessToken 
+                   }).then(function successCallback(response) {          
+                        $ionicLoading.hide();
+                        console.log("SUGESTOES");
+                        console.log(response.data);
+                        $scope.sugestions = response.data;            
+                   }, function errorCallback(response) {
+                      $http({
+                            method: 'GET',
+                            url: 'http://' + WEBSERVICE_URL_SERVER + '/NiceDateWS/users/' + userId +'/sugestions' 
+                       }).then(function successCallback(response) {          
+                            $ionicLoading.hide();
+                            $scope.sugestions = response.data;            
+                       }, function errorCallback(response) {
+                          console.log("getUserSugestion");
+                          $scope.modalErro.show();
+                          $ionicLoading.hide();              
+                       });    
+                   });
+              }else{
+                  $scope.modalSettingAlert.show();
+              }
+         }, function errorCallback(response) {            
+              console.log("hasSettings");
+              $scope.modalErro.show();
+              $ionicLoading.hide();              
+         });        
     };
+
+
+    //Verifica se usuario possui as preferencias principais configuradas
+    // Autor Edian Comachio
+    function hasSettings(){      
+
+        
+    }
 
     //Busca sugestões automaticamente ao abrir a tela de sugestões
     $scope.getUserSugestion();
@@ -1455,9 +1713,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
             $ionicLoading.hide();
 
             }, function errorCallback(response) {
-                console.log("FALHA");
-            // called asynchronously if an error occurs
-            // or server returns response with an error status.
+              console.log("getUserSugestion");
+              $scope.modalErro.show();
+              $ionicLoading.hide();              
           });   
       
       });        
@@ -1513,9 +1771,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
        $scope.profile = response.data;                 
        console.log($scope.profile);
     }, function errorCallback(response) {
-        console.log("FALHA");
-        // called asynchronously if an error occurs
-        // or server returns response with an error status.
+       console.log("getUserSugestion");
+       $scope.modalErro.show();
+       $ionicLoading.hide();              
   });
 })
 
@@ -1574,6 +1832,22 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 .controller( 'ChatCtrl', [ 'Messages','$scope','$ionicModal','WEBSERVICE_URL', '$timeout','$stateParams','$http','$rootScope','$state', '$ionicLoading',
                   function( Messages, $scope, $ionicModal, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $timeout, $stateParams, $http, $rootScope, $state, $ionicLoading ){
     
+    /* 
+     * Autor: Edian Comachio
+     * Trecho que trata Erros exibidos para o usuario 
+     */
+    /*inicializa modal de erro */
+    $ionicModal.fromTemplateUrl('templates/errorDefaultPage.html', {
+      scope: $scope
+    }).then(function(modalErro) {
+      $scope.modalErro = modalErro;
+    });
+
+    $scope.closeError = function() {
+      console.log("errorclose");
+      $scope.modalErro.hide();      
+    };
+
     /* inicializa a modal */
     $ionicModal.fromTemplateUrl('templates/profile.html', {
       scope: $scope
@@ -1659,9 +1933,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
             $ionicLoading.hide();
 
             }, function errorCallback(response) {
-                console.log("FALHA");
-            // called asynchronously if an error occurs
-            // or server returns response with an error status.
+                console.log("callMatchProfile");
+                $scope.modalErro.show();
+                $ionicLoading.hide();              
           });     
       });        
       
