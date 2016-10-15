@@ -153,7 +153,6 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
         });
   }
 
-  
   /*
    * Name: updateUser() 
    * Description: Método reponsavel por atualizar o usuario na base
@@ -187,7 +186,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       error(function(data, status, headers, config) {          
         $http.post("http://" + WEBSERVICE_URL_SERVER + "/NiceDateWS/users/update", $scope.userConfig, config).
         success(function(data, status, headers, config) {
-            $scope.modalLoading.hide();    
+            $scope.modalLoading.hide();   
             $state.go('tabs.sugestion');
         }).
         error(function(data, status, headers, config) {          
@@ -1091,6 +1090,28 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       $scope.modal = modal;
     });
 
+    $scope.getUserInfoSidebar = function(){                
+        var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
+        console.log("aquisd");
+        $http({
+            method: 'GET',
+            url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/profile' 
+         }).then(function successCallback(response) { 
+             $scope.currentProfile = response.data;  
+          }, function errorCallback(response) {
+            $http({
+                method: 'GET',
+                url: 'http://' + WEBSERVICE_URL_SERVER + '/NiceDateWS/users/' + userId +'/profile' 
+             }).then(function successCallback(response) { 
+                 $scope.currentProfile = response.data;          
+              }, function errorCallback(response) {
+                  console.log("getUserInfoSidebar");
+                  $scope.modalErro.show();
+                  $ionicLoading.hide();                                    
+            });                      
+        });
+    };     
+
    /*
     * Name: $scope.getUserInfo() 
     * Description: Método reponsavel por buscar perfil do usuário no webservice.
@@ -1099,12 +1120,13 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     */ 
     $scope.getUserInfo = function(){                
         var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
+        console.log("aquisd");
         $http({
             method: 'GET',
             url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/profile' 
          }).then(function successCallback(response) { 
              console.log(response);
-             $scope.profile = response.data;  
+             $scope.currentProfile = response.data;  
              //console.log($scope.profile.socialLinks[0]);
              // Open the profile modal
              $scope.modal.show();
@@ -1116,7 +1138,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
                 url: 'http://' + WEBSERVICE_URL_SERVER + '/NiceDateWS/users/' + userId +'/profile' 
              }).then(function successCallback(response) { 
                  console.log(response);
-                 $scope.profile = response.data;          
+                 $scope.currentProfile = response.data;          
 
                  // Open the profile modal
                  $scope.modal.show();
@@ -1358,9 +1380,6 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       //$scope.bar.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];      
       
     };
-
-    //Busca sugestões automaticamente ao abrir a tela de sugestões
-    $scope.getUserSugestion();  
 })
 
 /*
@@ -1391,6 +1410,13 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     }).then(function(modalProfile) {
       $scope.modalProfile = modalProfile;
     });
+
+    /* inicializa a modal do perfil da sugestao*/
+    $ionicModal.fromTemplateUrl('templates/sugestionProfile.html', {
+      scope: $scope
+    }).then(function(modalSugestionProfile) {
+      $scope.modalSugestionProfile = modalSugestionProfile;
+    });
    
     /* inicializa a modal settings Alert*/
     $ionicModal.fromTemplateUrl('templates/settingsAlert.html', {
@@ -1399,6 +1425,15 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       console.log("aiaiaia esse amor");
       $scope.modalSettingAlert = modalSettingAlert;
     });
+
+   /*
+    * Name: $scope.closeSugestionProfile()
+    * Description: Método reponsavel por fechar a modal do perfil da sugestão
+    * Author: Fabrício Cappellari    
+    */     
+    $scope.closeSugestionProfile = function(){
+      $scope.modalSugestionProfile.hide();
+    };
 
    /*
     * Name: $scope.like()
@@ -1421,7 +1456,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
         
       }
 
-      //setLikeWs(sugestion);    
+      setLikeWs(sugestion);    
     }
 
     $scope.deleteCard = function deleteCard(index){ 
@@ -1618,6 +1653,8 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       console.log("getUserSugestion");
       $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 }); 
 
+      console.log($scope.currentProfile);
+
       /* sugestion object 
        * id = id facebook
        * name = Nome          
@@ -1642,7 +1679,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
                         $ionicLoading.hide();
                         console.log("SUGESTOES");
                         console.log(response.data);
-                        $scope.sugestions = response.data;            
+                        $scope.sugestions = response.data;
                    }, function errorCallback(response) {
                       $http({
                             method: 'GET',
@@ -1698,7 +1735,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
         var distanceKm = getDistanceFromLatLonInKm($scope.profile.latitude, $scope.profile.longitude, window.localStorage['geoLocalizationLat'], window.localStorage['geoLocalizationLong']);
         $scope.profile.distance = parseInt(distanceKm, 10);        
 
-        $scope.modalProfile.show();    
+        $scope.modalSugestionProfile.show();    
         $ionicLoading.hide();
 
         }, function errorCallback(response) {
@@ -1709,7 +1746,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
             console.log(response)
             $scope.profile = response.data;          
 
-            $scope.modalProfile.show();    
+            $scope.modalSugestionProfile.show();    
             $ionicLoading.hide();
 
             }, function errorCallback(response) {
@@ -1729,7 +1766,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     */     
     $scope.closeProfile = function() {
       $scope.modalProfile.hide();      
-    }; 
+    };
 
     function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
       var R = 6371; // Radius of the earth in km
@@ -1918,7 +1955,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 
         $scope.profile = response.data;          
 
-        $scope.modalProfile.show();
+        $scope.modalSugestionProfile.show();
         $ionicLoading.hide();
 
         }, function errorCallback(response) {
@@ -1929,7 +1966,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 
             $scope.profile = response.data;          
 
-            $scope.modalProfile.show();
+            $scope.modalSugestionProfile.show();
             $ionicLoading.hide();
 
             }, function errorCallback(response) {

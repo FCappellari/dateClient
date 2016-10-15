@@ -4,7 +4,7 @@
   Author: Edian Comachio 
  -->
 
-<ion-side-menus enable-menu-with-back-views="false">
+<ion-side-menus enable-menu-with-back-views="false" ng-init="getUserInfoSidebar()">
   <ion-side-menu-content>
     <!-- section reponsavel por apresentar o botão do menu lateral - Tres listrinhas -->
     <ion-nav-bar class="bar bar-positive">
@@ -35,15 +35,15 @@
 
   <!-- Side Menu (left) 
     Section que gerencia o conteúdo interno no menu lateral.
-      1 - Profile: Apresenta o perfil do usuário logado
+      1 - currentProfile: Apresenta o perfil do usuário logado
       2 - Settings: Configurações gerais da aplicação (TODO)
       3 - SingOut: Logoff do sistema (TODO - logoff facebook)
   -->
   <ion-side-menu side="left">
-    <ion-header-bar class="expanded bar bar-header disable-user-behavior" style="background-image: url({{profile.coverPicUrl}});">
-        <img src="{{profile.photos[0]}}" class="avatar motion spin fade" style="height: 4.8em; width: 4.8em;">
+    <ion-header-bar class="expanded bar bar-header disable-user-behavior" style="background-image: url({{currentProfile.coverPicUrl}});">
+        <img src="{{currentProfile.photos[0]}}" class="avatar motion spin fade" style="height: 4.8em; width: 4.8em;">
         <div class="menu-bottom">
-            {{profile.name}}
+            {{currentProfile.name}}
         </div>
     </ion-header-bar>
     <ion-content class="stable-bg has-expanded-header stable-bg-custom">
