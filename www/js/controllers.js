@@ -1,4 +1,4 @@
-angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', 'ngCordova', 'ngImgCrop','uiGmapgoogle-maps', 'ngAnimate'])
+angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', 'ngCordova', 'ngImgCrop','uiGmapgoogle-maps', 'ngAnimate', 'ionic.cloud'])
 
 .constant('WEBSERVICE_URL', 'localhost:8080')
 //.constant('WEBSERVICE_URL', '52.34.48.120:8180')
@@ -12,7 +12,12 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
  * Controller: AppCrtl
  * Description: Gerenciamento geral da aplicação
  */
-.controller('AppCtrl', function ($scope, $cordovaGeolocation, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $q, UserService, $ionicLoading) {
+.controller('AppCtrl', function ($scope, $ionicPush, $ionicUser, $ionicAuth, $ionicPlatform, $cordovaGeolocation, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $q, UserService, $ionicLoading) {
+    
+    $scope.$on('cloud:push:notification', function(event, data) {
+      var msg = data.message;
+      alert(msg.title + ': ' + msg.text);
+    });
 
     /* 
      * Autor: Edian Comachio
@@ -42,19 +47,12 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
    * Description: Método reponsavel por direcionar o login conforme a plataforma WEB ou Dispositivo movel
    * Author: Edian Comachio
    */
-  $scope.login = function(){    
+  $scope.login = function(){       
 
-    var posOptions = {timeout: 10000, enableHighAccuracy: false};
-    $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {        
-        window.localStorage['geoLocalizationLat'] = position.coords.latitude;
-        window.localStorage['geoLocalizationLong'] = position.coords.longitude;
-        console.log(window.localStorage['geoLocalizationLong']);
-    }, function(err) {
-        console.log("ERRO AO PEGAR LOCALIZACAO");
-    });
+    console.log("ANDROID:", ionic.Platform.isAndroid());
 
-    if (window.cordova) {
-      console.log("DEVICE");
+    if (ionic.Platform.isAndroid()) {
+      console.log("DEVICE:", window.cordova);
       $scope.facebookSignIn();
     } else {
       console.log("WEB");
@@ -106,8 +104,12 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       $scope.user = user;
       $rootScope.userId = user.id;
       $rootScope.accessToken = user.accessToken;
+
+      ionicUserPush();
+
       window.localStorage['userId'] = user.id;     
       console.log(user);
+
       checkIfUserExist();     
       
     },
@@ -116,12 +118,74 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     });
   }  
   
+  function ionicUserPush(){
+      $scope.data = {
+        'email': $rootScope.userId + '@date.com',
+        'password': $rootScope.userId
+      }
+
+      if ($ionicAuth.isAuthenticated()) {
+          // Make sure the user data is going to be loaded
+          $ionicUser.load().then(function() {}); 
+
+          $ionicPush.register().then(function(t) {
+            return $ionicPush.saveToken(t);
+          }).then(function(t) {
+            console.log('Token saved:', t.token);
+            window.localStorage['deviceToken'] = t.token;     
+            window.localStorage['ionicEmail'] = $scope.data.email;
+          });     
+          
+      }else{
+        console.log("aqui 1");
+        $ionicAuth.login('basic', $scope.data).then(function(){}, function(err){
+          console.log("aqui 2");
+          $ionicAuth.signup($scope.data).then(function() {
+              // `$ionicUser` is now registered
+              console.log("aqui 3");
+              $ionicAuth.login('basic', $scope.data).then(function(){
+                  console.log("$ionicAuth.login: success");
+
+                $ionicPush.register().then(function(t) {
+                  return $ionicPush.saveToken(t);
+                }).then(function(t) {
+                  console.log('Token saved:', t.token);
+                  window.localStorage['deviceToken'] = t.token;     
+                  window.localStorage['ionicEmail'] = $scope.data.email;
+                });     
+              });
+          }, function(err) {
+              console.log(err);
+              var error_lookup = {
+                  'required_email': 'Missing email field',
+                  'required_password': 'Missing password field',
+                  'conflict_email': 'A user has already signed up with that email',
+                  'conflict_username': 'A user has already signed up with that username',
+                  'invalid_email': 'The email did not pass validation'
+              }    
+          
+              $scope.error = error_lookup[err.details[0]];
+          });
+        })
+      }
+  }
+
   /*
    * Name: checkIfUserExist() 
    * Description: Método reponsavel por verificar se o usuario existe no bando de dados
    * Author: Edian Comachio
    */  
   checkIfUserExist = function(){
+
+      var posOptions = {enableHighAccuracy: false};
+      $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {        
+        window.localStorage['geoLocalizationLat'] = position.coords.latitude;
+        window.localStorage['geoLocalizationLong'] = position.coords.longitude;
+        console.log(window.localStorage['geoLocalizationLong']);
+      }, function(err) {
+          console.log("ERRO AO PEGAR LOCALIZACAO");
+      });
+
       $scope.message = "Calibrating your heart...";
       $http({
         method: 'GET',
@@ -153,6 +217,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
         });
   }
 
+  
   /*
    * Name: updateUser() 
    * Description: Método reponsavel por atualizar o usuario na base
@@ -171,7 +236,9 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       //objeto usuario
       $scope.userConfig = {
         accessToken: window.localStorage['accessToken'],
-        id: $rootScope.userId,
+        id: window.localStorage['userId'],
+        deviceToken: window.localStorage['deviceToken'],
+        ionicEmail: window.localStorage['ionicEmail'],
         location: {
           latitude: window.localStorage['geoLocalizationLat'],
           longitude: window.localStorage['geoLocalizationLong']
@@ -180,13 +247,13 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 
       $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/update", $scope.userConfig, config).
       success(function(data, status, headers, config) {
-          $scope.modalLoading.hide();    
+          $scope.modalLoading.hide();                        
           $state.go('tabs.sugestion');
       }).
       error(function(data, status, headers, config) {          
         $http.post("http://" + WEBSERVICE_URL_SERVER + "/NiceDateWS/users/update", $scope.userConfig, config).
         success(function(data, status, headers, config) {
-            $scope.modalLoading.hide();   
+            $scope.modalLoading.hide();    
             $state.go('tabs.sugestion');
         }).
         error(function(data, status, headers, config) {          
@@ -218,6 +285,8 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       $scope.userConfig = {
         accessToken: window.localStorage['accessToken'],
         id: $rootScope.userId,
+        deviceToken: window.localStorage['deviceToken'],
+        ionicEmail: window.localStorage['ionicEmail'],
         location: {
           latitude: window.localStorage['geoLocalizationLat'],
           longitude: window.localStorage['geoLocalizationLong']
@@ -271,7 +340,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
         picture : "http://graph.facebook.com/" + authResponse.userID + "/picture?type=large"
       });
       $ionicLoading.hide();
-      $state.go('app.home');
+      //$state.go('app.home');
     }, function(fail){
         // Fail get profile info
         console.log('profile info fail', fail);
@@ -349,6 +418,8 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
             $rootScope.userId = profileInfo.id;
             $rootScope.accessToken = profileInfo.accessToken;            
 
+            ionicUserPush();
+
             window.localStorage['userId'] = profileInfo.id;                  
 
             checkIfUserExist();            
@@ -363,6 +434,8 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
             $scope.user = profileInfo;
             $rootScope.userId = profileInfo.id;
             $rootScope.accessToken = profileInfo.accessToken;
+
+            ionicUserPush();
             
             window.localStorage['userId'] = profileInfo.id;
             
@@ -401,6 +474,11 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
  * Description: Reposável pelo gerenciamento do perfil do usuário 
  */     
 .controller('SettingsCtrl', function ($scope, $state, configService, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading) {  
+
+    $scope.$on('cloud:push:notification', function(event, data) {
+      var msg = data.message;
+      alert(msg.title + ': ' + msg.text);
+    });
 
     /* 
      * Autor: Edian Comachio
@@ -463,6 +541,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     * TODO - tratamento de erro do webservice
     */ 
     $scope.getUserSettings = function(){       
+      
        console.log(window.localStorage['userId']);
        $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 });
        
@@ -474,12 +553,70 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
              console.log(response);
              $scope.settings = response.data;                   
              
-            console.log($scope.settings.choice);
+            console.log($scope.settings.distance);
 
              //$state.go('settings');
              $ionicLoading.hide();
 
-             buildMap();             
+             //buildMap();             
+             var latitude = window.localStorage['geoLocalizationLat'];
+             var longitude = window.localStorage['geoLocalizationLong'];
+             var distance = 100;
+             
+             console.log("distance", distance);
+
+             var latLng = new google.maps.LatLng(latitude, longitude);      
+
+             console.log("$scope");
+             console.log(latLng);
+
+             var center = latLng;
+
+            $scope.map = {
+                center: center,
+                pan: true,
+                zoom: 7,
+                refresh: false,
+                events: {},
+                bounds: {},          
+                options: {
+                  navigationControl: false,
+                  mapTypeControl: false,
+                  scaleControl: false,
+                  draggable: false,
+                  mapTypeId: google.maps.MapTypeId.ROADMAP,
+                  disableDefaultUI: true
+                }
+              };        
+
+              $scope.map.circle = {
+                id: 1,
+                center: center,
+                radius: $scope.settings.distance * 1000,
+                stroke: {
+                  color: '#08B21F',
+                  weight: 2,
+                  opacity: 1
+                },
+                fill: {
+                  color: '#08B21F',
+                  opacity: 0.4
+                },
+                geodesic: false, // optional: defaults to false
+                draggable: false, // optional: defaults to false
+                clickable: false, // optional: defaults to true
+                editable: false, // optional: defaults to false
+                visible: true, // optional: defaults to true
+                events:{
+                  dblclick: function(){
+                    window.alert("circle dblclick");
+                  },
+                  radius_changed: function(){
+                      //window.alert("circle radius radius_changed");
+                      console.log("circle radius radius_changed");
+                  }
+                }
+              }      
              $scope.modal.show();            
              
           }, function errorCallback(response) {
@@ -500,12 +637,12 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
                   $ionicLoading.hide();                                    
             });                      
         });
-
+      
        //$scope.modal.show();
        //$ionicLoading.hide();
      };
 
-     $scope.save = function(){
+     $scope.saveSettings = function(){
         
         $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 });
 
@@ -517,18 +654,18 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
         $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/updateUserSettings", $scope.userConfig, config).
           success(function(data, status, headers, config) {
               $ionicLoading.hide();    
-              console.log("aqui");
               swal("Alright!", "Everything saved!", "success");
               $scope.modal.hide();
+              $scope.$emit("callGetUserSugestion", {});             
               
           }).error(function(data, status, headers, config) {          
-        
               $http.post("http://" + WEBSERVICE_URL_SERVER + "/NiceDateWS/users/updateUserSettings", $scope.userConfig, config).
               success(function(data, status, headers, config) {
                   $scope.modalLoading.hide();    
-                  console.log("aqui2");
                   swal("Alright!", "Everything saved!", "success");
                   $scope.modal.hide();
+                  $scope.$emit("callGetUserSugestion", {});
+
               }).
               error(function(data, status, headers, config) {                          
                   console.log("save");
@@ -548,65 +685,17 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
      });
 
      buildMap = function(){
-       var latitude = window.localStorage['geoLocalizationLat'];
-       var longitude = window.localStorage['geoLocalizationLong'];
 
-       var latLng = new google.maps.LatLng(latitude, longitude);      
-
-       var center = latLng;
-
-        $scope.map = {
-          center: center,
-          pan: true,
-          zoom: 7,
-          refresh: false,
-          events: {},
-          bounds: {},          
-          options: {
-            navigationControl: false,
-            mapTypeControl: false,
-            scaleControl: false,
-            draggable: false,
-            mapTypeId: google.maps.MapTypeId.ROADMAP,
-            disableDefaultUI: true
-          }
-        };
-
-        console.log($scope.settings.distance);
-
-        $scope.map.circle = {
-          id: 1,
-          center: center,
-          radius: $scope.settings.distance * 1000,
-          stroke: {
-            color: '#08B21F',
-            weight: 2,
-            opacity: 1
-          },
-          fill: {
-            color: '#08B21F',
-            opacity: 0.4
-          },
-          geodesic: false, // optional: defaults to false
-          draggable: false, // optional: defaults to false
-          clickable: false, // optional: defaults to true
-          editable: false, // optional: defaults to false
-          visible: true, // optional: defaults to true
-          events:{
-            dblclick: function(){
-              window.alert("circle dblclick");
-            },
-            radius_changed: function(){
-                //window.alert("circle radius radius_changed");
-                console.log("circle radius radius_changed");
-            }
-          }
-        }      
      }
 })
 
 .controller('cropImageController' , function ($scope, $state, configService, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading, $cordovaImagePicker, $interval) {  
   
+$scope.$on('cloud:push:notification', function(event, data) {
+      var msg = data.message;
+      alert(msg.title + ': ' + msg.text);
+    });
+
     /* 
      * Autor: Edian Comachio
      * Trecho que trata Erros exibidos para o usuario 
@@ -697,6 +786,11 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 
 .controller('editProfileController' , function ($scope, configService, $state, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading, $cordovaImagePicker, $interval) {  
 
+$scope.$on('cloud:push:notification', function(event, data) {
+      var msg = data.message;
+      alert(msg.title + ': ' + msg.text);
+    });
+
     /*inicializa modal para edicao dos perfis */
     $ionicModal.fromTemplateUrl('templates/editSocialLinks.html', {
       scope: $scope
@@ -757,8 +851,10 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     } 
 
     $scope.addSocialLink2 = function(index){
-      $scope.modalAddSocialLink.show();      
       $scope.socialLink = index;
+      console.log("console sociallink =");
+      console.log($scope.socialLink);
+      $scope.modalAddSocialLink.show();      
     }
 
     $scope.addSocialLink = function(){
@@ -770,8 +866,11 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
             method: 'GET',
             url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/socialLink/' + userId + '/getSocialLinks' 
          }).then(function successCallback(response) { 
-            console.log("addSocialLinks");
+             console.log("addSocialLinks");
+          
              $scope.socialLinks = response.data.socialLinks;          
+
+             console.log($scope.socialLinks);
              
              $ionicLoading.hide();
 
@@ -1067,6 +1166,11 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
  */     
 .controller('ProfileCtrl', function ($scope, $state, $stateParams, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $stateParams, $timeout, $http, $rootScope, $ionicSlideBoxDelegate,$ionicModal,$ionicLoading) {  
  
+$scope.$on('cloud:push:notification', function(event, data) {
+      var msg = data.message;
+      alert(msg.title + ': ' + msg.text);
+    });
+
     /* 
      * Autor: Edian Comachio
      * Trecho que trata Erros exibidos para o usuario 
@@ -1090,29 +1194,43 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       $scope.modal = modal;
     });
 
+    $ionicModal.fromTemplateUrl('templates/editProfile.html', {
+      scope: $scope
+    }).then(function(modalEditProfile) {
+      $scope.modalEditProfile = modalEditProfile;
+    });   
+
+  /*
+    * Name: $scope.getUserInfoSibebar() 
+    * Description: Método reponsavel por buscar perfil do usuário no webservice.
+    * Author: Edian Comachio
+    * TODO - tratamento de erro do webservice
+    */ 
     $scope.getUserInfoSidebar = function(){                
         var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
-        console.log("aquisd");
         $http({
             method: 'GET',
             url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/profile' 
          }).then(function successCallback(response) { 
-             $scope.currentProfile = response.data;  
+             console.log(response);
+             $scope.currentProfile = response.data;               
+
           }, function errorCallback(response) {
             $http({
                 method: 'GET',
                 url: 'http://' + WEBSERVICE_URL_SERVER + '/NiceDateWS/users/' + userId +'/profile' 
              }).then(function successCallback(response) { 
+                 console.log(response);
                  $scope.currentProfile = response.data;          
+
               }, function errorCallback(response) {
-                  console.log("getUserInfoSidebar");
+                  console.log("getUserInfo");
                   $scope.modalErro.show();
                   $ionicLoading.hide();                                    
             });                      
         });
-    };     
-
-   /*
+    };         
+      /*
     * Name: $scope.getUserInfo() 
     * Description: Método reponsavel por buscar perfil do usuário no webservice.
     * Author: Edian Comachio
@@ -1120,7 +1238,6 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     */ 
     $scope.getUserInfo = function(){                
         var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
-        console.log("aquisd");
         $http({
             method: 'GET',
             url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/profile' 
@@ -1151,14 +1268,15 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
             });                      
         });
     };     
-    
+
     $scope.editProfile = function(){
       
       // Open the profile modal
+      console.log("axqui");
       $scope.modalEditProfile.show();
       $ionicLoading.hide();      
 
-    }
+    };
 
     //Nao lembro mais o que isso faz, mas funciona. TODO verificar possibilidade de retirar
     if($stateParams.idProfile==""||$stateParams.idProfile==undefined){
@@ -1210,6 +1328,10 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 
 .controller('MatchesCtrl', function ($scope, configService, orderByFilter, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $timeout, ngFB, $stateParams, $http, $rootScope, $state, $ionicLoading) {
   
+  $scope.$on('cloud:push:notification', function(event, data) {
+      var msg = data.message;
+      alert(msg.title + ': ' + msg.text);
+    });
     /* 
      * Autor: Edian Comachio
      * Trecho que trata Erros exibidos para o usuario 
@@ -1248,6 +1370,8 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 
     $scope.getUserMatches = function(){
       
+        console.log("aqui matches");
+
       $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 }); 
 
       var userId = window.localStorage['userId'] || 'semID';
@@ -1330,7 +1454,8 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       $scope.buildGraph(interests);
     };
 
-    $scope.chat = function(){         
+    $scope.chat = function(match){  
+       $scope.chatMatch = match;
        $scope.modalChat.show();
     };
 
@@ -1342,10 +1467,8 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       $scope.modalProfile.hide();      
     }; 
 
-    $scope.buildGraph = function(interests){  
-      //doughnut      
-      console.log($scope.match.interestsInCommon);
-
+    $scope.buildGraph = function(interests){ 
+      
       $scope.doughnut = {};                  
       $scope.doughnut.visible = true;            
       $scope.doughnut.data = [[interests[0].relevance, 
@@ -1363,12 +1486,14 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       $scope.doughnut.legend = true;
 
       //line
+      console.log(interests);
+
       $scope.bar = {};                  
-      $scope.bar.labels = [interests[0].name, 
-                           interests[1].name, 
-                           interests[2].name, 
-                           interests[3].name, 
-                           interests[4].name];      
+      $scope.bar.labels = [interests[0].name.substring(0, 19), 
+                           interests[1].name.substring(0, 19), 
+                           interests[2].name.substring(0, 19), 
+                           interests[3].name.substring(0, 19), 
+                           interests[4].name.substring(0, 19)];      
       $scope.bar.data = [
         [interests[0].relevance, 
          interests[1].relevance, 
@@ -1380,6 +1505,8 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       //$scope.bar.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }];      
       
     };
+
+    
 })
 
 /*
@@ -1387,6 +1514,20 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
  * Description: Reposável pelo gerenciamento das sugestões do usuário 
  */     
 .controller('SugestionCtrl', function ($scope, $interval, configService, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $ionicModal, $ionicScrollDelegate, ngFB, $stateParams, $http, $rootScope, $state, $ionicLoading) {
+
+    $scope.$on('cloud:push:notification', function(event, data) {
+      var msg = data.message;
+      alert(msg.title + ': ' + msg.text);
+    });
+
+    /* 
+     * Autor: Fabricio Cappellari
+     * Metodo para chamar o get sugestion em outro controle
+     */
+    $rootScope.$on("callGetUserSugestion", function(){
+        $scope.getUserSugestion();
+        $scope.modalSettingAlert.hide();
+    });
 
     /* 
      * Autor: Edian Comachio
@@ -1410,7 +1551,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     }).then(function(modalProfile) {
       $scope.modalProfile = modalProfile;
     });
-
+   
     /* inicializa a modal do perfil da sugestao*/
     $ionicModal.fromTemplateUrl('templates/sugestionProfile.html', {
       scope: $scope
@@ -1530,13 +1671,13 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
 
     function matchAnimation(sugestion){
 
-      console.log("$scope.dislike = function(sugestion)");      
+      console.log("function matchAnimation(sugestion)");      
 
       var topModal = $ionicScrollDelegate.$getByHandle('sugestionScrollHandle').getScrollPosition().top - 5;      
       angular.element(document.querySelector('.overlay')).css({ top: topModal + 'px' });;
       angular.element(document.querySelector('.overlay')).addClass('is-active');      
       angular.element(document.querySelector('.match1')).css('background-image', 'url(' + sugestion.profilePic + ')');
-      angular.element(document.querySelector('.match2')).css('background-image', 'url(' + $scope.profile.photos[0] + ')');
+      angular.element(document.querySelector('.match2')).css('background-image', 'url(' + $scope.currentProfile.photos[0] + ')');
       
       console.log($ionicScrollDelegate.$getByHandle('sugestionScrollHandle').getScrollView());            
       angular.element(document.querySelector('.outWithHasTabsTop')).css('overflow-y', 'hidden');      
@@ -1633,16 +1774,52 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     $scope.doRefreshSugestion = function(){
       
       var userId = window.localStorage['userId'] || 'semID';
+      var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
 
-      $http.get('http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/sugestions?accessToken=' + accessToken)
-         .success(function(newItems) {
-           $scope.sugestions = newItems;
-         })
-         .finally(function() {
-           // Stop the ion-refresher from spinning
+      var getNewSugestions = function () {
+          $interval.cancel(promise2);
+          $scope.getUserSugestion();              
+      }
+
            $scope.$broadcast('scroll.refreshComplete');
-         });      
+
+      promise2 = $interval(getNewSugestions, 900);      
+
+      
     }
+
+    $scope.getUserInfo = function(){                
+      
+      var userId = window.localStorage['userId'] || 'semID';
+      var accessToken = window.localStorage['accessToken'] || 'semAccessToken';
+        
+        $http({
+            method: 'GET',
+            url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId +'/profile' 
+         }).then(function successCallback(response) { 
+             console.log("response");
+             $scope.currrentProfile = response.data;  
+             console.log($scope.currrentProfile);
+             //console.log($scope.profile.socialLinks[0]);
+             // Open the profile modal
+             $scope.getUserSugestion();
+
+          }, function errorCallback(response) {
+            $http({
+                method: 'GET',
+                url: 'http://' + WEBSERVICE_URL_SERVER + '/NiceDateWS/users/' + userId +'/profile' 
+             }).then(function successCallback(response) { 
+                 console.log(response);
+                 $scope.currentProfile = response.data;                          
+           
+
+              }, function errorCallback(response) {
+                  console.log("getUserInfo");
+                  $scope.modalErro.show();
+                  $ionicLoading.hide();                                    
+            });                      
+        });
+    };     
 
    /*
     * Name: $scope.getUserSugestion()
@@ -1651,9 +1828,10 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     */     
     $scope.getUserSugestion = function(){
       console.log("getUserSugestion");
-      $ionicLoading.show({content: 'Loading',animation: 'fade-in', showBackdrop: true, maxWidth: 200, showDelay: 0 }); 
 
-      console.log($scope.currentProfile);
+      $scope.sugestions = "";
+      $scope.sugestionPlaceholder = "Hold on... We are looking for new people";
+      $scope.hasSugestions = false;
 
       /* sugestion object 
        * id = id facebook
@@ -1677,9 +1855,10 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
                         url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/sugestions?id=' + userId + '&accessToken=' + accessToken 
                    }).then(function successCallback(response) {          
                         $ionicLoading.hide();
-                        console.log("SUGESTOES");
+                        console.log("SUGESTOES");                        
                         console.log(response.data);
-                        $scope.sugestions = response.data;
+                        $scope.sugestions = response.data;            
+                        $scope.hasSugestions = true;
                    }, function errorCallback(response) {
                       $http({
                             method: 'GET',
@@ -1687,10 +1866,13 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
                        }).then(function successCallback(response) {          
                             $ionicLoading.hide();
                             $scope.sugestions = response.data;            
+                            $scope.hasSugestions = true;
                        }, function errorCallback(response) {
                           console.log("getUserSugestion");
                           $scope.modalErro.show();
+                          $scope.sugestionPlaceholder = "Opsss :(";
                           $ionicLoading.hide();              
+                          $scope.hasSugestions = false;      
                        });    
                    });
               }else{
@@ -1733,9 +1915,10 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
         $scope.profile = response.data;          
         
         var distanceKm = getDistanceFromLatLonInKm($scope.profile.latitude, $scope.profile.longitude, window.localStorage['geoLocalizationLat'], window.localStorage['geoLocalizationLong']);
-        $scope.profile.distance = parseInt(distanceKm, 10);        
-
+        $scope.profile.distance = parseInt(distanceKm, 10);
+        console.log("antes");
         $scope.modalSugestionProfile.show();    
+        console.log("antes");
         $ionicLoading.hide();
 
         }, function errorCallback(response) {
@@ -1745,7 +1928,6 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
            }).then(function successCallback(response) {
             console.log(response)
             $scope.profile = response.data;          
-
             $scope.modalSugestionProfile.show();    
             $ionicLoading.hide();
 
@@ -1766,7 +1948,7 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     */     
     $scope.closeProfile = function() {
       $scope.modalProfile.hide();      
-    };
+    }; 
 
     function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
       var R = 6371; // Radius of the earth in km
@@ -1866,8 +2048,8 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
   };
 })
 
-.controller( 'ChatCtrl', [ 'Messages','$scope','$ionicModal','WEBSERVICE_URL', '$timeout','$stateParams','$http','$rootScope','$state', '$ionicLoading',
-                  function( Messages, $scope, $ionicModal, WEBSERVICE_URL, WEBSERVICE_URL_SERVER, $timeout, $stateParams, $http, $rootScope, $state, $ionicLoading ){
+.controller( 'ChatCtrl', [ 'Messages','$scope','$ionicModal','WEBSERVICE_URL', '$timeout','$stateParams','$http','$rootScope','$state', '$ionicLoading', '$interval',
+                  function( Messages, $scope, $ionicModal, WEBSERVICE_URL,  $timeout, $stateParams, $http, $rootScope, $state, $ionicLoading, $interval ){
     
     /* 
      * Autor: Edian Comachio
@@ -1892,6 +2074,57 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
       $scope.modalProfile = modalProfile;
     });
 
+    $scope.getMessages = function (match){
+
+      var getMessagesAux = function (match) {
+           $scope.getMessagesWs(match);
+      }
+
+      promise2 = $interval(getMessagesAux(match), 2000);      
+    }
+
+    $scope.getMessagesWs = function(match){
+      userId = window.localStorage['userId'];
+
+      console.log($scope.currentProfile.name.split(" ")[0]);
+
+      $http({
+            method: 'GET',
+            url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/chat/getMessageByUser?toId=' + match.id + '&fromId=' + userId
+      }).then(function successCallback(response) { 
+        chat.messages = [];
+                console.log(response.data);
+                listMessages = response.data;
+                console.log("apos retorno e atribuicao");
+                
+                for (var i = 0; i < listMessages.messages.length; i++){
+                  console.log("akkaak")
+                          if (userId == listMessages.messages[i].from) {
+                             msg = {
+                              name : $scope.currentProfile.name.split(" ")[0],
+                              data : listMessages.messages[i].message,
+                              self : true
+                             }
+                             console.log(msg);
+                             chat.messages.push(msg);
+                          }
+                          else {
+                            msg = {
+                              name : match.name.split(" ")[0],
+                              data : listMessages.messages[i].message,
+                              self : false
+                             }
+                             console.log(msg);
+                             chat.messages.push(msg);
+                          }
+                }      
+                console.log(chat.messages);
+
+             }, function errorCallback(response) {
+                console.log("messageErro");   
+           });
+    }
+
     // Message Inbox
         // Self Object
     var chat = this;
@@ -1899,35 +2132,44 @@ angular.module('starter.controllers', ['starter.services', 'chart.js', 'chat', '
     // Sent Indicator
     chat.status = "";
 
-    // Keep an Array of Messages
-    chat.messages = [];
-
-    // Set User Data
-
-    Messages.user({ name : "teste" });
-
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Get Received Messages and Add it to Messages Array.
     // This will automatically update the view.
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    var chatmessages = document.querySelector(".chat-messages");
-    Messages.receive(function(msg){
-        console.log(msg);
-        chat.messages.push(msg);
-        setTimeout( function() {
-            chatmessages.scrollTop = chatmessages.scrollHeight;
-        }, 10 );
-    });
+     
+     //var chatmessages = document.querySelector(".chat-messages");
+     //Messages.receive(function(msg){
+        //console.log(msg);
+        //chat.messages.push(msg);
+        //setTimeout( function() {
+            //chatmessages.scrollTop = chatmessages.scrollHeight;
+        //}, 10 );
+   // });
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Send Messages
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     chat.send = function() {
         Messages.send({ data : chat.textbox });
-        chat.status = "sending";
-        chat.textbox = "";
-        setTimeout( function() { chat.status = "" }, 1200 );
-    };
+        userId = window.localStorage['userId'];
+        console.log($scope.chatMatch);
+              
+        $scope.userChat = {
+            from:  userId,
+            to:    $scope.chatMatch.id,
+            message: chat.textbox
+        }
+
+        console.log($scope.userChat);
+
+        $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/chat/save", $scope.userChat).
+        success(function(data, status, headers, chat) {
+            console.log("AEHO");
+        }).
+        error(function(data, status, headers, chat) {          
+              console.log("chatError");
+        });
+      };
 
     $scope.closeProfile = function() {       
        $scope.modalProfile.hide();
