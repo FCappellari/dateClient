@@ -11,13 +11,12 @@
     <h1 class="title">Settings</h1>    
   </ion-header-bar>
   <ion-content class=" outWithHasTabsTop"> 
-
-    <div class="settingsContent">
+   <div class="settingsContent">
     <h4>Are you interested in:</h4>                  
     <ion-list>
-      <ion-radio ng-model="choice" ng-value="MALE">Men</ion-radio>
-      <ion-radio ng-model="choice" ng-value="FEMALE">Womem</ion-radio>
-      <ion-radio ng-model="choice" ng-value="BOTH">Both</ion-radio>
+      <ion-radio ng-model="settings.choice" value="MALE">Men</ion-radio>
+      <ion-radio ng-model="settings.choice" value="FEMALE">Womem</ion-radio>
+      <ion-radio ng-model="settings.choice" value="BOTH">Both</ion-radio>
     </ion-list>        
     <h4>Begin Age</h4>    
     <div class="item range">
@@ -53,6 +52,6 @@
         </ui-gmap-circle>
     </ui-gmap-google-map>
    </div>   
-    <button class="button button-block button-positive" ng-click="save()">Save</button>
+    <button class="button button-block button-positive" ng-click="saveSettings()">Save</button>
   </ion-content>                      
 </ion-modal-view>

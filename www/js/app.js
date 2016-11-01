@@ -3,7 +3,10 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-native-transitions', 'chart.js', 'uiGmapgoogle-maps'])
+angular.module('starter.controllers', []);
+
+angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 
+                           'ionic-native-transitions', 'chart.js', 'uiGmapgoogle-maps', 'ionic.cloud'])
 
 
 .factory('configService', function() {
@@ -77,7 +80,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-na
     }
 })
 
-.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider, uiGmapGoogleMapApiProvider) {
+.config(function($stateProvider, $urlRouterProvider, $ionicCloudProvider, $ionicConfigProvider, uiGmapGoogleMapApiProvider) {
 
   //import 'ionic-native-transitions';
   //require('ionic-native-transitions');
@@ -153,6 +156,29 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngOpenFB', 'ionic-na
         language: 'en',
         sensor: 'false',
     });
+
+  $ionicCloudProvider.init({
+    "core": {
+      "app_id": "c3921fcd"
+    },
+    "push": {
+      "sender_id": "46818684398",
+      "pluginConfig": {
+        "ios": {
+          "badge": true,
+          "sound": true
+        },
+        "android": {
+          "iconColor": "#343434"
+        }
+      }
+    },
+    "auth": {
+      "facebook": {
+        
+      }
+    }
+  });
 })    
 
 .controller('LoginCtrl', function($scope, $state) {

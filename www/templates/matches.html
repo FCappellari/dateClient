@@ -12,8 +12,14 @@
         <input type="search" placeholder="Search" ng-model="searchMatches">
       </label>    
     </div>
+    <!--
+    <div class="matchPlaceholder">
+      <img src="css/heart-placeholder.png"/>
+      <h2>No matches yet, keep playing</h2>
+    </div>
+    -->
     <ion-list>    
-      <ion-item class="item-remove-animate item-thumbnail-left  item item-avatar matches" href="#" ng-repeat="match in matches | filter:searchMatches" ng-click="chat()">
+      <ion-item class="item-remove-animate item-thumbnail-left  item item-avatar matches" href="#" ng-repeat="match in matches | filter:searchMatches" ng-click="chat(match)">
       	
       <img src="{{match.profilePic}}">
 	    <h2>{{match.name}}</h2>

@@ -7,19 +7,15 @@
          <i class="icon icon-left ion-edit"></i>
     </button> 
     <ion-slide-box on-slide-changed="slideHasChanged($index)" delegate-handle="editSlide" class="no-padding">
-      <ion-slide ng-repeat="photo in profile.photos" repeat-done="repeatDone()">                
+      <ion-slide ng-repeat="photo in currentProfile.photos" repeat-done="repeatDone()">                
           <img ng-src="{{photo}}" height="400" width="400">                      
       </ion-slide>      
     </ion-slide-box>    
     <ion-list>
       <ion-item class="item item-text-wrap profileName">
-        <h2>{{profile.name}}</h2>
-        <span>            
-            <i class="icon icon-left ion-location profileDistance"> 22Km </i>           
-        </span>      
+        <h2>{{currentProfile.name}}</h2> 
       </ion-item>
       <label class="item item-input item-floating-label">
-        <span class="input-label">A little about yourself</span>
         <input type="text" placeholder="A little about yourself" ng-model="profile.bio">
       </label>            
 

@@ -4,7 +4,13 @@
   Author: Edian Comachio 
  -->
 <ion-view view-title="Sugestões">
-  <ion-content class="outWithHasTabsTop sugestionBG" delegate-handle="sugestionScrollHandle" scroll="{{allowScroll}}">    
+  <ion-content class="outWithHasTabsTopSugestion sugestionBG"                       
+      ng-style="{'background': hasSugestions==true ? 'url(css/blur1.jpg) no-repeat':'url()'}"
+               delegate-handle="sugestionScrollHandle" 
+               scroll="{{allowScroll}}">    
+    <ion-refresher
+      pulling-text="Pull to generate suggestions..." on-refresh="doRefreshSugestion()" spinner="none" ng-if="hasSugestions==true">
+    </ion-refresher>
     <section class="section-modal">              
       <div class="overlay">      
         <div style="background-image: url(img/match.png)" class="matchImg"></div>    
@@ -22,11 +28,16 @@
         </div>      
       </div>
     </section>
-    <div class="list card sugestionCard animate" ng-repeat="sugestion in sugestions" ng-model="sugestion">
+    <!--<div class="spinner spinner-4"></div>-->
+    <div class="load" ng-if="hasSugestions==false">
+        <div class="dot"></div>
+        <div class="outline"><span></span></div>
+    </div>
+    <div class="list card sugestionCard animate" ng-repeat="sugestion in sugestions" ng-model="sugestion" ng-if="hasSugestions==true">
       <ion-list>            
           <div class="info" id="sugestion-list">    
              <div class="sugestionName">
-                <p>{{sugestion.name}}, 20</p>
+                <p>{{sugestion.name}}, {{sugestion.age}}</p>
             </div>     
             <div class="item item-image sugestionImage">
               <img ng-src="{{sugestion.profilePic}}" class="suggestionImg" ng-click="callSugestionProfile(sugestion)">
