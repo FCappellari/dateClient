@@ -8,7 +8,7 @@
   <ion-content class="outWithHasTabsTop">           
     <div class="profile">
     <div id="profile-info">
-          <img id="profile-image" src="css/fb-logo.jpg">
+          <img id="profile-image" src="css/{{socialLink.name}}-logo.jpg">
       </div>
       <h1 class="profileTitle A7CCED">{{socialLink.name}}</h1>
     <ion-list>
@@ -34,7 +34,7 @@
         </label>
       </li>          
        <li class="item">
-       Content:        
+       {{socialLink.contentLabel}}        
           <label class="item item-input">
             <input type="text" placeholder="@{{profile.name}}" ng-model="socialLink.content">
           </label>      
