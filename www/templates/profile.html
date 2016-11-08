@@ -34,7 +34,7 @@
       <ion-item class="item item-text-wrap profileName">
          {{currentProfile.bio}}
       </ion-item>
-      <ion-item class="item item-text-wrap profileName" ng-repeat="sc in profile.socialLinks">                     
+      <ion-item class="item item-text-wrap profileName" ng-repeat="sc in currentProfile.socialLinks">                     
             <button ng-href="{{sc.link}}" class="button button-large button-clear button-positive ion-social-{{sc.name}}"></button>            
       </ion-item>      
     </ion-list>         

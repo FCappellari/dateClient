@@ -923,8 +923,9 @@ $scope.$on('cloud:push:notification', function(event, data) {
             method: 'GET',
             url: 'http://' + WEBSERVICE_URL + '/NiceDateWS/users/' + userId + '/getSocialLinks' 
          }).then(function successCallback(response) { 
+             console.log("aqui edit social links");
              console.log(response);
-             $scope.socialLinks = response.data.socialLink;          
+             $scope.socialLinks = response.data.socialLink;    
              
              $ionicLoading.hide();
 
@@ -981,6 +982,10 @@ $scope.$on('cloud:push:notification', function(event, data) {
           accessToken: window.localStorage['accessToken'],
           socialLink: $scope.socialLink
       }
+      console.log($scope.currentProfile.socialLinks);
+      console.log($scope.socialLink);
+      $scope.currentProfile.socialLinks.push($scope.socialLink);
+
      
       console.log($scope.userConfig);
 
@@ -1071,8 +1076,8 @@ $scope.$on('cloud:push:notification', function(event, data) {
             socialLink: $scope.socialLink
         }
 
-        console.log($scope.socialLink.everyone);
-        console.log($scope.socialLink.onlytomatches);
+        console.log("content =");
+        console.log($scope.socialLink.content);
 
         $http.post("http://" + WEBSERVICE_URL + "/NiceDateWS/users/editSocialLink", $scope.userConfig, config).
         success(function(data, status, headers, config) {
@@ -1220,6 +1225,7 @@ $scope.$on('cloud:push:notification', function(event, data) {
                 method: 'GET',
                 url: 'http://' + WEBSERVICE_URL_SERVER + '/NiceDateWS/users/' + userId +'/profile' 
              }).then(function successCallback(response) { 
+                 console.log("antes response");
                  console.log(response);
                  $scope.currentProfile = response.data;          
 
@@ -1272,7 +1278,7 @@ $scope.$on('cloud:push:notification', function(event, data) {
     $scope.editProfile = function(){
       
       // Open the profile modal
-      console.log("axqui");
+      
       $scope.modalEditProfile.show();
       $ionicLoading.hide();      
 
@@ -1915,10 +1921,10 @@ $scope.$on('cloud:push:notification', function(event, data) {
         $scope.profile = response.data;          
         
         var distanceKm = getDistanceFromLatLonInKm($scope.profile.latitude, $scope.profile.longitude, window.localStorage['geoLocalizationLat'], window.localStorage['geoLocalizationLong']);
+        $scope.scvisibility = "EVERYONE";
+        console.log($scope.scvisibility);
         $scope.profile.distance = parseInt(distanceKm, 10);
-        console.log("antes");
         $scope.modalSugestionProfile.show();    
-        console.log("antes");
         $ionicLoading.hide();
 
         }, function errorCallback(response) {

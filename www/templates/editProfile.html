@@ -19,12 +19,9 @@
         <input type="text" placeholder="A little about yourself" ng-model="profile.bio">
       </label>            
 
-      <ion-item class="item item-text-wrap ">
-            <button class="button button-large  button-clear button-positive  ion-social-twitter-outline"></button>
-            <button class="button button-large  button-clear button-positive ion-social-facebook"></button>
-            <button class="button button-large button-clear button-positive  ion-social-snapchat-outline "></button>
-     
-      </ion-item>
+      <ion-item class="item item-text-wrap profileName" ng-repeat="sc in currentProfile.socialLinks">                     
+            <button ng-href="{{sc.link}}" class="button button-large button-clear button-positive ion-social-{{sc.name}}"></button>            
+      </ion-item>      
 
       <button class="button button-block button-positive" ng-click="editSocialLinks()">Edit Social links</button>           
       <button class="button button-block button-balanced" ng-click="saveEditProfile()">Save</button>
